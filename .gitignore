@@ -1,0 +1,21 @@
+# Backend
+backend/.env
+backend/dist/
+backend/node_modules/
+
+# Dashboard
+dashboard/.env.local
+dashboard/.next/
+dashboard/node_modules/
+
+# Android keyboard
+keyboard/.gradle/
+keyboard/app/build/
+keyboard/build/
+keyboard/local.properties
+keyboard/**/*.apk
+keyboard/**/*.aab
+
+# General
+*.log
+.DS_Store
