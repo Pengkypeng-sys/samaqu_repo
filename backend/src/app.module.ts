@@ -20,7 +20,8 @@ import { ReportsModule } from './reports/reports.module';
         type: 'postgres',
         url: config.get('DATABASE_URL'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true, // ponytail: set false in production, use migrations
+        synchronize: config.get('NODE_ENV') !== 'production',
+        ssl: config.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
       }),
     }),
     AuthModule,
