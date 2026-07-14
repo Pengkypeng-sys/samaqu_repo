@@ -11,7 +11,7 @@ class TemplateRepository(ctx: Context) {
 
     suspend fun sync(): Result<Unit> = runCatching {
         RetrofitClient.init(prefs.apiUrl)
-        val remote = RetrofitClient.api.getTemplates(prefs.authHeader)
+        val remote = RetrofitClient.api.getTemplates()
         dao.clearTemplates()
         dao.clearCategories()
         dao.insertCategories(remote.map { CachedCategory(it.id, it.name) })

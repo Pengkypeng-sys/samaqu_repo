@@ -26,7 +26,7 @@ data class Product(
 
 interface ApiService {
     @GET("templates")
-    suspend fun getTemplates(@Header("Authorization") auth: String): List<CategoryWithTemplates>
+    suspend fun getTemplates(): List<CategoryWithTemplates>
 
     @GET("products")
     suspend fun getProducts(@Header("Authorization") auth: String): List<Product>

@@ -39,21 +39,38 @@
         android:paddingHorizontal="8dp"
         android:elevation="2dp">
 
-        <ImageButton
+        <TextView
+            android:id="@+id/btnSwitchKeyboard"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="⌨️"
+            android:textSize="18sp"
+            android:background="@null"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
             android:id="@+id/btnOrder"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@android:drawable/ic_menu_add"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Buat Order" />
+            android:gravity="center"
+            android:text="📋"
+            android:textSize="18sp"
+            android:background="@null"
+            android:clickable="true"
+            android:focusable="true" />
 
-        <ImageButton
+        <TextView
             android:id="@+id/btnShipping"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@android:drawable/ic_dialog_map"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Cek Ongkir" />
+            android:gravity="center"
+            android:text="🚚"
+            android:textSize="18sp"
+            android:background="@null"
+            android:clickable="true"
+            android:focusable="true" />
 
         <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
 
@@ -65,13 +82,16 @@
             android:textSize="10sp"
             android:textColor="#94A3B8" />
 
-        <ImageButton
+        <TextView
             android:id="@+id/btnSync"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@android:drawable/ic_popup_sync"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Sync" />
+            android:gravity="center"
+            android:text="🔄"
+            android:textSize="18sp"
+            android:background="@null"
+            android:clickable="true"
+            android:focusable="true" />
 
     </LinearLayout>
 
