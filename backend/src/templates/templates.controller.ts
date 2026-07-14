@@ -12,7 +12,6 @@ class UpdateTemplateDto {
   @IsString() content: string;
 }
 
-@UseGuards(JwtAuthGuard)
 @Controller('templates')
 export class TemplatesController {
   constructor(private service: TemplatesService) {}
