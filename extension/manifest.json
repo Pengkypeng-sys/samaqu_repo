@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "SAMAQU Keyboard",
+  "version": "1.0.0",
+  "description": "Template pesan cepat untuk CS — langsung di WhatsApp Web",
+  "permissions": ["storage"],
+  "host_permissions": ["https://web.whatsapp.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content.js"],
+      "css": ["panel.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon48.png"
+    }
+  },
+  "icons": {
+    "48": "icon48.png"
+  }
+}
