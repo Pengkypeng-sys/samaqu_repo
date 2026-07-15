@@ -76,15 +76,18 @@ function injectUI() {
           <div class="sq-row2">
             <div class="sq-field">
               <label>Jasa Pengiriman</label>
-              <select id="inv-shipping">
-                <option>Gojek Instant</option>
-                <option>J&amp;T Express</option>
-                <option>Lalamove</option>
-                <option>SiCepat</option>
-                <option>JNE</option>
-                <option>Anteraja</option>
-                <option>Shopee Express</option>
-              </select>
+              <div class="sq-custom-select" id="inv-shipping-wrap">
+                <div class="sq-select-val" id="inv-shipping-val">Gojek Instant ▾</div>
+                <div class="sq-select-opts" id="inv-shipping-opts" style="display:none">
+                  <div class="sq-opt sq-opt-active" data-val="Gojek Instant">Gojek Instant</div>
+                  <div class="sq-opt" data-val="J&T Express">J&T Express</div>
+                  <div class="sq-opt" data-val="Lalamove">Lalamove</div>
+                  <div class="sq-opt" data-val="SiCepat">SiCepat</div>
+                  <div class="sq-opt" data-val="JNE">JNE</div>
+                  <div class="sq-opt" data-val="Anteraja">Anteraja</div>
+                  <div class="sq-opt" data-val="Shopee Express">Shopee Express</div>
+                </div>
+              </div>
             </div>
             <div class="sq-field">
               <label>Ongkos Kirim (Rp)</label>
@@ -146,6 +149,23 @@ function injectUI() {
   panel.querySelectorAll('.sq-nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
   panel.querySelector('#sq-search').addEventListener('input', e => renderList(e.target.value.toLowerCase()));
   panel.querySelector('#inv-generate').addEventListener('click', generateInvoice);
+
+  // Custom select for shipping
+  const selVal  = panel.querySelector('#inv-shipping-val');
+  const selOpts = panel.querySelector('#inv-shipping-opts');
+  selVal.addEventListener('click', e => {
+    e.stopPropagation();
+    selOpts.style.display = selOpts.style.display === 'none' ? 'block' : 'none';
+  });
+  selOpts.querySelectorAll('.sq-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      selOpts.querySelectorAll('.sq-opt').forEach(o => o.classList.remove('sq-opt-active'));
+      opt.classList.add('sq-opt-active');
+      selVal.textContent = opt.dataset.val + ' ▾';
+      selOpts.style.display = 'none';
+    });
+  });
+  document.addEventListener('click', () => { if (selOpts) selOpts.style.display = 'none'; });
 
   loadTemplates();
   setupEmoji();
@@ -235,7 +255,7 @@ function generateInvoice() {
   const qty      = parseInt(g('#inv-qty').value) || 1;
   const price    = parseFloat(g('#inv-price').value) || 0;
   const ongkir   = parseFloat(g('#inv-ongkir').value) || 0;
-  const shipping = g('#inv-shipping').value;
+  const shipping = (panel.querySelector('.sq-opt-active')?.dataset.val) || 'Gojek Instant';
   const fmt = v => new Intl.NumberFormat('id-ID').format(v);
   const total = price * qty + ongkir;
   insertText(`🧾 *INVOICE SAMAQU*\nPembeli  : ${buyer}\nProduk   : ${product}\nQty      : ${qty} pcs\nSubtotal : Rp ${fmt(price * qty)}\nKurir    : ${shipping}\nOngkir   : Rp ${fmt(ongkir)}\n*TOTAL   : Rp ${fmt(total)}*`);

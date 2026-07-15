@@ -180,6 +180,30 @@
 .sq-field input::placeholder { color: #94A3B8; }
 .sq-field select { color: #1E293B; }
 
+/* Custom select — tidak terpengaruh dark CSS WA */
+.sq-custom-select { position: relative; }
+.sq-select-val {
+  padding: 9px 11px; border: 1.5px solid #E2E8F0;
+  border-radius: 10px; font-size: 12.5px; font-family: inherit;
+  color: #1E293B; background: #fff; cursor: pointer;
+  user-select: none; transition: border-color .12s;
+}
+.sq-select-val:hover { border-color: #93C5FD; }
+.sq-select-opts {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: #fff; border: 1.5px solid #DBEAFE;
+  border-radius: 10px; z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  overflow: hidden;
+}
+.sq-opt {
+  padding: 9px 12px; font-size: 12.5px; color: #1E293B;
+  cursor: pointer; font-family: inherit;
+  transition: background .1s;
+}
+.sq-opt:hover     { background: #EFF6FF; }
+.sq-opt-active    { background: #DBEAFE; color: #1D4ED8; font-weight: 700; }
+
 #inv-generate {
   padding: 12px; margin-top: 4px;
   background: linear-gradient(135deg, #1D4ED8, #2563EB);
