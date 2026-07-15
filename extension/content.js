@@ -319,7 +319,7 @@ function renderCats() {
   templates.forEach((cat, i) => {
     const b = document.createElement('button');
     b.className = 'sq-cat' + (i === 0 ? ' sq-cat-active' : '');
-    b.textContent = cat.category;
+    b.innerHTML = `${cat.category} <span class="sq-cat-n">${cat.items.length}</span>`;
     b.addEventListener('click', () => {
       el.querySelectorAll('.sq-cat').forEach(x => x.classList.remove('sq-cat-active'));
       b.classList.add('sq-cat-active');
@@ -341,7 +341,13 @@ function renderList(query) {
       found++;
       const d = document.createElement('div');
       d.className = 'sq-item';
-      d.innerHTML = `<span class="sq-item-text">${text}</span><span class="sq-item-send">➤</span>`;
+      d.innerHTML = `
+        <div class="sq-item-accent"></div>
+        <div class="sq-item-body">
+          <div class="sq-item-text">${text}</div>
+          <div class="sq-item-hint">Tap untuk kirim ke chat</div>
+        </div>
+        <div class="sq-item-arrow">›</div>`;
       d.addEventListener('click', () => insertText(text));
       list.appendChild(d);
     });
