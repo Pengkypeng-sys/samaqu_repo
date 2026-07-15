@@ -6,7 +6,7 @@ import { isLoggedIn, logout } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import {
   ShoppingCart, FileText, Package, CreditCard,
-  BarChart2, LogOut, Zap,
+  BarChart2, LogOut, Zap, Settings2,
 } from 'lucide-react';
 
 const nav = [
@@ -15,6 +15,7 @@ const nav = [
   { href: '/templates', label: 'Template',   icon: FileText,     color: 'text-purple-500' },
   { href: '/products',  label: 'Produk',     icon: Package,      color: 'text-orange-500' },
   { href: '/reports',   label: 'Laporan',    icon: BarChart2,    color: 'text-pink-500' },
+  { href: '/settings',  label: 'Pengaturan', icon: Settings2,    color: 'text-gray-500' },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

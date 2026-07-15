@@ -1,10 +1,19 @@
 import axios from 'axios';
 
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-});
+export const STORAGE_KEY_URL = 'samaqu_api_url';
+
+export function getApiUrl(): string {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem(STORAGE_KEY_URL);
+    if (saved) return saved;
+  }
+  return process.env.NEXT_PUBLIC_API_URL || '';
+}
+
+export const api = axios.create();
 
 api.interceptors.request.use((config) => {
+  if (!config.baseURL) config.baseURL = getApiUrl();
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
