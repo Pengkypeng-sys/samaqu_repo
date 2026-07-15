@@ -40,6 +40,10 @@ function injectUI() {
     <div id="sq-body">
       <!-- AUTO TEXT -->
       <div id="sq-autotext" class="sq-page">
+        <div class="sq-at-header">
+          <span class="sq-at-title">💬 Template Pesan</span>
+          <span id="sq-tpl-count" class="sq-at-count"></span>
+        </div>
         <div class="sq-search-wrap">
           <span class="sq-search-icon">🔍</span>
           <input id="sq-search" type="text" placeholder="Cari template...">
@@ -337,11 +341,13 @@ function renderList(query) {
       found++;
       const d = document.createElement('div');
       d.className = 'sq-item';
-      d.textContent = text;
+      d.innerHTML = `<span class="sq-item-text">${text}</span><span class="sq-item-send">➤</span>`;
       d.addEventListener('click', () => insertText(text));
       list.appendChild(d);
     });
   });
+  const countEl = panel.querySelector('#sq-tpl-count');
+  if (countEl) countEl.textContent = found ? `${found} template` : '';
   if (!found) {
     const d = document.createElement('div');
     d.className = 'sq-empty-state';
