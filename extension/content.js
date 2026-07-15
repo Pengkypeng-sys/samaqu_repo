@@ -94,6 +94,37 @@ function injectUI() {
               <input id="inv-ongkir" type="number" placeholder="0">
             </div>
           </div>
+          <!-- Bank Transfer -->
+          <div class="sq-field">
+            <label>Transfer Bank (opsional)</label>
+            <div id="inv-banks">
+              <button class="sq-bank-btn" data-bank="BCA" data-color="#0066AE">
+                <span class="sq-bank-logo bca">BCA</span>
+              </button>
+              <button class="sq-bank-btn" data-bank="BRI" data-color="#0077C0">
+                <span class="sq-bank-logo bri">BRI</span>
+              </button>
+              <button class="sq-bank-btn" data-bank="BNI" data-color="#F37021">
+                <span class="sq-bank-logo bni">BNI</span>
+              </button>
+              <button class="sq-bank-btn" data-bank="Mandiri" data-color="#003D7C">
+                <span class="sq-bank-logo mandiri">MND</span>
+              </button>
+              <button class="sq-bank-btn" data-bank="BSI" data-color="#3D8B37">
+                <span class="sq-bank-logo bsi">BSI</span>
+              </button>
+              <button class="sq-bank-btn" data-bank="DANA" data-color="#108EE9">
+                <span class="sq-bank-logo dana">DANA</span>
+              </button>
+              <button class="sq-bank-btn" data-bank="OVO" data-color="#4C3494">
+                <span class="sq-bank-logo ovo">OVO</span>
+              </button>
+            </div>
+            <div id="inv-bank-fields" style="display:none">
+              <input id="inv-bank-name" type="text" placeholder="No. Rekening / No. HP" style="margin-top:6px">
+              <input id="inv-bank-holder" type="text" placeholder="Atas nama" style="margin-top:6px">
+            </div>
+          </div>
           <button id="inv-generate">📋 Generate &amp; Kirim ke Chat</button>
         </div>
       </div>
@@ -182,6 +213,25 @@ function injectUI() {
   panel.querySelectorAll('.sq-nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
   panel.querySelector('#sq-search').addEventListener('input', e => renderList(e.target.value.toLowerCase()));
   panel.querySelector('#inv-generate').addEventListener('click', generateInvoice);
+
+  // Bank selection
+  let selectedBank = '';
+  panel.querySelectorAll('.sq-bank-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const bank = btn.dataset.bank;
+      if (selectedBank === bank) {
+        selectedBank = '';
+        panel.querySelectorAll('.sq-bank-btn').forEach(b => b.classList.remove('sq-bank-active'));
+        panel.querySelector('#inv-bank-fields').style.display = 'none';
+      } else {
+        selectedBank = bank;
+        panel.querySelectorAll('.sq-bank-btn').forEach(b => b.classList.remove('sq-bank-active'));
+        btn.classList.add('sq-bank-active');
+        panel.querySelector('#inv-bank-fields').style.display = 'block';
+        panel.querySelector('#inv-bank-name').placeholder = bank === 'DANA' || bank === 'OVO' ? 'No. HP' : 'No. Rekening';
+      }
+    });
+  });
 
   // Custom select for shipping
   const selVal  = panel.querySelector('#inv-shipping-val');
@@ -307,10 +357,19 @@ function generateInvoice() {
   const qty      = parseInt(g('#inv-qty').value) || 1;
   const price    = parseFloat(g('#inv-price').value) || 0;
   const ongkir   = parseFloat(g('#inv-ongkir').value) || 0;
-  const shipping = (panel.querySelector('.sq-opt-active')?.dataset.val) || 'Gojek Instant';
+  const shipping = panel.querySelector('#inv-shipping-opts .sq-opt-active')?.dataset.val || 'Gojek Instant';
+  const bankName   = g('#inv-bank-name')?.value.trim() || '';
+  const bankHolder = g('#inv-bank-holder')?.value.trim() || '';
   const fmt = v => new Intl.NumberFormat('id-ID').format(v);
   const total = price * qty + ongkir;
-  insertText(`🧾 *INVOICE SAMAQU*\nPembeli  : ${buyer}\nProduk   : ${product}\nQty      : ${qty} pcs\nSubtotal : Rp ${fmt(price * qty)}\nKurir    : ${shipping}\nOngkir   : Rp ${fmt(ongkir)}\n*TOTAL   : Rp ${fmt(total)}*`);
+  const activeBank = panel.querySelector('.sq-bank-btn.sq-bank-active')?.dataset.bank || '';
+
+  let text = `🧾 *INVOICE SAMAQU*\nPembeli  : ${buyer}\nProduk   : ${product}\nQty      : ${qty} pcs\nSubtotal : Rp ${fmt(price * qty)}\nKurir    : ${shipping}\nOngkir   : Rp ${fmt(ongkir)}\n*TOTAL   : Rp ${fmt(total)}*`;
+  if (activeBank && bankName) {
+    text += `\n\n💳 *Pembayaran via ${activeBank}*\nNo. Rek  : ${bankName}`;
+    if (bankHolder) text += `\nA/N      : ${bankHolder}`;
+  }
+  insertText(text);
 }
 
 async function loadPending() {
@@ -476,10 +535,13 @@ async function checkOngkir() {
     const fmt = v => new Intl.NumberFormat('id-ID').format(v);
     results.innerHTML = '';
     data.pricing.sort((a, b) => a.price - b.price).forEach(p => {
+      const courierEmoji = {'JNE':'📦','J&T':'🚀','SiCepat':'⚡','Anteraja':'🔵','GoSend':'🟢','GrabExpress':'🟡','Wahana':'🔴','Lion':'🦁'};
+      const emo = Object.entries(courierEmoji).find(([k]) => p.courier_name.includes(k))?.[1] || '🚚';
       const el = document.createElement('div');
       el.className = 'sq-rate-card';
       el.innerHTML = `
         <div class="sq-rate-top">
+          <span class="sq-rate-emo">${emo}</span>
           <span class="sq-rate-courier">${p.courier_name}</span>
           <span class="sq-rate-service">${p.courier_service_name}</span>
         </div>
