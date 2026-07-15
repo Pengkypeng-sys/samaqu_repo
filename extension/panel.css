@@ -219,15 +219,53 @@
 }
 
 /* ── ONGKIR ────────────────────────────────────── */
+.sq-ongkir-form {
+  padding: 8px 14px; display: flex; flex-direction: column;
+  gap: 8px; flex-shrink: 0;
+}
+.sq-field { position: relative; }
+.sq-suggest {
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: #fff; border: 1.5px solid #DBEAFE;
+  border-radius: 10px; z-index: 99999;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  max-height: 160px; overflow-y: auto;
+}
+.sq-suggest-item {
+  padding: 8px 12px; font-size: 12px; color: #1E293B;
+  cursor: pointer; border-bottom: 1px solid #F1F5F9;
+}
+.sq-suggest-item:hover { background: #EFF6FF; }
+#oq-check {
+  padding: 10px; background: linear-gradient(135deg,#1D4ED8,#2563EB);
+  color: #fff; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit;
+}
+#oq-results { flex: 1; overflow-y: auto; padding: 4px 14px 10px; }
+.sq-rate-card {
+  background: #fff; border: 1.5px solid #EEF2FF;
+  border-radius: 10px; padding: 10px 12px; margin-bottom: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.sq-rate-top { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.sq-rate-courier { font-weight: 700; font-size: 12.5px; color: #1E293B; }
+.sq-rate-service {
+  font-size: 10px; background: #EFF6FF; color: #1D4ED8;
+  padding: 2px 8px; border-radius: 20px; font-weight: 600;
+}
+.sq-rate-bot { display: flex; align-items: center; gap: 8px; }
+.sq-rate-price { font-size: 13px; font-weight: 800; color: #1D4ED8; flex: 1; }
+.sq-rate-eta { font-size: 11px; color: #64748B; }
+.sq-rate-send {
+  padding: 5px 10px; background: #1D4ED8; color: #fff;
+  border: none; border-radius: 8px; font-size: 11px;
+  font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.sq-rate-send:hover { background: #1558A0; }
 .sq-dev-icon  { font-size: 56px; margin-bottom: 16px; }
-.sq-dev-title {
-  font-size: 15px; font-weight: 800; color: #1D4ED8;
-  margin-bottom: 10px; text-align: center;
-}
-.sq-dev-desc  {
-  font-size: 13px; color: #64748B;
-  text-align: center; line-height: 1.7;
-}
+.sq-dev-title { font-size: 15px; font-weight: 800; color: #1D4ED8; margin-bottom: 10px; text-align: center; }
+.sq-dev-desc  { font-size: 13px; color: #64748B; text-align: center; line-height: 1.7; }
 
 /* ── PENDING ───────────────────────────────────── */
 #sq-pending-list { flex: 1; overflow-y: auto; padding: 0 12px 8px; }

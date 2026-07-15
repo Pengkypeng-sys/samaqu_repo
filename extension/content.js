@@ -99,10 +99,43 @@ function injectUI() {
       </div>
 
       <!-- ONGKIR -->
-      <div id="sq-ongkir" class="sq-page sq-center" style="display:none">
-        <div class="sq-dev-icon">🚧</div>
-        <div class="sq-dev-title">Sedang Tahap Development</div>
-        <div class="sq-dev-desc">Fitur Cek Ongkir akan segera hadir.<br>Terima kasih atas kesabarannya 🙏</div>
+      <div id="sq-ongkir" class="sq-page" style="display:none">
+        <div class="sq-section-title">🚚 Cek Ongkir</div>
+        <div class="sq-ongkir-form">
+          <div class="sq-field">
+            <label>Kota Asal</label>
+            <input id="oq-origin" type="text" placeholder="Cari kota asal..." autocomplete="off">
+            <div class="sq-suggest" id="oq-origin-list"></div>
+          </div>
+          <div class="sq-field">
+            <label>Kota Tujuan</label>
+            <input id="oq-dest" type="text" placeholder="Cari kota tujuan..." autocomplete="off">
+            <div class="sq-suggest" id="oq-dest-list"></div>
+          </div>
+          <div class="sq-row2">
+            <div class="sq-field">
+              <label>Berat (gram)</label>
+              <input id="oq-weight" type="number" placeholder="1000" value="1000" min="1">
+            </div>
+            <div class="sq-field">
+              <label>Kurir</label>
+              <div class="sq-custom-select" id="oq-courier-wrap">
+                <div class="sq-select-val" id="oq-courier-val">Semua Kurir ▾</div>
+                <div class="sq-select-opts" id="oq-courier-opts" style="display:none">
+                  <div class="sq-opt sq-opt-active" data-val="">Semua Kurir</div>
+                  <div class="sq-opt" data-val="jne">JNE</div>
+                  <div class="sq-opt" data-val="jnt">J&T Express</div>
+                  <div class="sq-opt" data-val="sicepat">SiCepat</div>
+                  <div class="sq-opt" data-val="anteraja">Anteraja</div>
+                  <div class="sq-opt" data-val="gosend">Gojek Gosend</div>
+                  <div class="sq-opt" data-val="grab_express">Grab Express</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button id="oq-check">🔍 Cek Ongkir</button>
+        </div>
+        <div id="oq-results"></div>
       </div>
 
       <!-- PENDING -->
@@ -166,6 +199,25 @@ function injectUI() {
     });
   });
   document.addEventListener('click', () => { if (selOpts) selOpts.style.display = 'none'; });
+
+  // Ongkir courier custom select
+  const oqVal  = panel.querySelector('#oq-courier-val');
+  const oqOpts = panel.querySelector('#oq-courier-opts');
+  oqVal.addEventListener('click', e => { e.stopPropagation(); oqOpts.style.display = oqOpts.style.display === 'none' ? 'block' : 'none'; });
+  oqOpts.querySelectorAll('.sq-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      oqOpts.querySelectorAll('.sq-opt').forEach(o => o.classList.remove('sq-opt-active'));
+      opt.classList.add('sq-opt-active');
+      oqVal.textContent = opt.textContent + ' ▾';
+      oqOpts.style.display = 'none';
+    });
+  });
+
+  // City autocomplete
+  setupCitySearch('oq-origin', 'oq-origin-list');
+  setupCitySearch('oq-dest', 'oq-dest-list');
+
+  panel.querySelector('#oq-check').addEventListener('click', checkOngkir);
 
   loadTemplates();
   setupEmoji();
@@ -340,6 +392,110 @@ function renderEmoji(emojis) {
     b.addEventListener('click', () => insertText(e));
     grid.appendChild(b);
   });
+}
+
+// ── Ongkir ───────────────────────────────────────────────────────────────────
+const cityCache = {};
+
+function setupCitySearch(inputId, listId) {
+  const input = panel.querySelector(`#${inputId}`);
+  const list  = panel.querySelector(`#${listId}`);
+  input._areaId = '';
+  let timer;
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    input._areaId = '';
+    const q = input.value.trim();
+    if (q.length < 2) { list.innerHTML = ''; list.style.display = 'none'; return; }
+    timer = setTimeout(async () => {
+      const stored = await storageGet(['biteship_key']);
+      const key = stored['biteship_key'] || '';
+      if (!key) { list.innerHTML = '<div class="sq-suggest-item">⚠️ Biteship key belum diisi</div>'; list.style.display = 'block'; return; }
+      if (cityCache[q]) { renderCitySuggest(list, input, cityCache[q]); return; }
+      try {
+        const res = await fetch(`https://api.biteship.com/v1/maps/areas?countries=ID&input=${encodeURIComponent(q)}&type=single`, {
+          headers: { Authorization: key }
+        });
+        const data = await res.json();
+        cityCache[q] = data.areas || [];
+        renderCitySuggest(list, input, cityCache[q]);
+      } catch (e) { list.innerHTML = `<div class="sq-suggest-item">❌ ${e.message}</div>`; list.style.display = 'block'; }
+    }, 400);
+  });
+}
+
+function renderCitySuggest(list, input, areas) {
+  list.innerHTML = '';
+  if (!areas.length) { list.innerHTML = '<div class="sq-suggest-item">Kota tidak ditemukan</div>'; list.style.display = 'block'; return; }
+  areas.slice(0, 6).forEach(a => {
+    const d = document.createElement('div');
+    d.className = 'sq-suggest-item';
+    d.textContent = `${a.name}, ${a.administrative_division_level_2_name || ''} (${a.postal_code || ''})`;
+    d.addEventListener('click', () => {
+      input.value = d.textContent;
+      input._areaId = a.id;
+      list.innerHTML = ''; list.style.display = 'none';
+    });
+    list.appendChild(d);
+  });
+  list.style.display = 'block';
+}
+
+async function checkOngkir() {
+  const results = panel.querySelector('#oq-results');
+  const originInput = panel.querySelector('#oq-origin');
+  const destInput   = panel.querySelector('#oq-dest');
+  const weight = parseInt(panel.querySelector('#oq-weight').value) || 1000;
+  const courier = panel.querySelector('#oq-courier-opts .sq-opt-active')?.dataset.val || '';
+
+  if (!originInput._areaId || !destInput._areaId) {
+    results.innerHTML = '<div class="sq-empty-state">⚠️ Pilih kota dari dropdown saran</div>';
+    return;
+  }
+
+  results.innerHTML = '<div class="sq-empty-state">⏳ Mengecek ongkir...</div>';
+
+  const stored = await storageGet(['biteship_key']);
+  const key = stored['biteship_key'] || '';
+  if (!key) { results.innerHTML = '<div class="sq-empty-state">⚠️ Biteship API key belum diisi di pengaturan</div>'; return; }
+
+  try {
+    const body = {
+      origin_area_id: originInput._areaId,
+      destination_area_id: destInput._areaId,
+      couriers: courier || 'jne,jnt,sicepat,anteraja,gosend,grab_express,wahana,lion',
+      items: [{ name: 'Paket', value: 10000, weight, quantity: 1 }]
+    };
+    const res = await fetch('https://api.biteship.com/v1/rates/couriers', {
+      method: 'POST',
+      headers: { Authorization: key, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!data.pricing?.length) { results.innerHTML = '<div class="sq-empty-state">Tidak ada layanan tersedia</div>'; return; }
+    const fmt = v => new Intl.NumberFormat('id-ID').format(v);
+    results.innerHTML = '';
+    data.pricing.sort((a, b) => a.price - b.price).forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'sq-rate-card';
+      el.innerHTML = `
+        <div class="sq-rate-top">
+          <span class="sq-rate-courier">${p.courier_name}</span>
+          <span class="sq-rate-service">${p.courier_service_name}</span>
+        </div>
+        <div class="sq-rate-bot">
+          <span class="sq-rate-price">Rp ${fmt(p.price)}</span>
+          <span class="sq-rate-eta">${p.shipment_duration_range || ''} hari</span>
+          <button class="sq-rate-send">Kirim ke Chat</button>
+        </div>`;
+      el.querySelector('.sq-rate-send').addEventListener('click', () => {
+        insertText(`🚚 *Cek Ongkir*\nKurir  : ${p.courier_name} (${p.courier_service_name})\nOngkir : Rp ${fmt(p.price)}\nEstimasi : ${p.shipment_duration_range || '-'} hari`);
+      });
+      results.appendChild(el);
+    });
+  } catch (e) {
+    results.innerHTML = `<div class="sq-empty-state">❌ ${e.message}</div>`;
+  }
 }
 
 function insertText(text) {
