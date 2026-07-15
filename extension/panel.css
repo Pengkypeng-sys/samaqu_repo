@@ -352,3 +352,19 @@
   transition: background .1s;
 }
 .sq-emoji:hover { background: #EEF2FF; }
+
+/* Courier logos in dropdown */
+.sq-courier-logo {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 1px 5px; border-radius: 4px;
+  font-size: 9px; font-weight: 800; color: #fff;
+  vertical-align: middle; margin-right: 2px; letter-spacing: .3px;
+}
+.sq-courier-logo.gojek    { background: #00AA13; }
+.sq-courier-logo.jnt      { background: #E30613; }
+.sq-courier-logo.lalamove { background: #FF7B00; }
+.sq-courier-logo.sicepat  { background: #E82529; }
+.sq-courier-logo.jne      { background: #CC0001; }
+.sq-courier-logo.anteraja { background: #0067B1; }
+.sq-courier-logo.shopee   { background: #EE4D2D; }
+.sq-courier-logo.grab     { background: #00B14F; }

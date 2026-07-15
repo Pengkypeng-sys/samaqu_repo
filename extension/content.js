@@ -79,13 +79,13 @@ function injectUI() {
               <div class="sq-custom-select" id="inv-shipping-wrap">
                 <div class="sq-select-val" id="inv-shipping-val">Gojek Instant ▾</div>
                 <div class="sq-select-opts" id="inv-shipping-opts" style="display:none">
-                  <div class="sq-opt sq-opt-active" data-val="Gojek Instant">Gojek Instant</div>
-                  <div class="sq-opt" data-val="J&T Express">J&T Express</div>
-                  <div class="sq-opt" data-val="Lalamove">Lalamove</div>
-                  <div class="sq-opt" data-val="SiCepat">SiCepat</div>
-                  <div class="sq-opt" data-val="JNE">JNE</div>
-                  <div class="sq-opt" data-val="Anteraja">Anteraja</div>
-                  <div class="sq-opt" data-val="Shopee Express">Shopee Express</div>
+                  <div class="sq-opt sq-opt-active" data-val="Gojek Instant"><span class="sq-courier-logo gojek">GO</span> Gojek Instant</div>
+                  <div class="sq-opt" data-val="J&T Express"><span class="sq-courier-logo jnt">J&T</span> J&T Express</div>
+                  <div class="sq-opt" data-val="Lalamove"><span class="sq-courier-logo lalamove">LM</span> Lalamove</div>
+                  <div class="sq-opt" data-val="SiCepat"><span class="sq-courier-logo sicepat">SC</span> SiCepat</div>
+                  <div class="sq-opt" data-val="JNE"><span class="sq-courier-logo jne">JNE</span> JNE</div>
+                  <div class="sq-opt" data-val="Anteraja"><span class="sq-courier-logo anteraja">ANT</span> Anteraja</div>
+                  <div class="sq-opt" data-val="Shopee Express"><span class="sq-courier-logo shopee">SPX</span> Shopee Express</div>
                 </div>
               </div>
             </div>
@@ -153,13 +153,13 @@ function injectUI() {
               <div class="sq-custom-select" id="oq-courier-wrap">
                 <div class="sq-select-val" id="oq-courier-val">Semua Kurir ▾</div>
                 <div class="sq-select-opts" id="oq-courier-opts" style="display:none">
-                  <div class="sq-opt sq-opt-active" data-val="">Semua Kurir</div>
-                  <div class="sq-opt" data-val="jne">JNE</div>
-                  <div class="sq-opt" data-val="jnt">J&T Express</div>
-                  <div class="sq-opt" data-val="sicepat">SiCepat</div>
-                  <div class="sq-opt" data-val="anteraja">Anteraja</div>
-                  <div class="sq-opt" data-val="gosend">Gojek Gosend</div>
-                  <div class="sq-opt" data-val="grab_express">Grab Express</div>
+                  <div class="sq-opt sq-opt-active" data-val="">🚚 Semua Kurir</div>
+                  <div class="sq-opt" data-val="jne"><span class="sq-courier-logo jne">JNE</span> JNE</div>
+                  <div class="sq-opt" data-val="jnt"><span class="sq-courier-logo jnt">J&T</span> J&T Express</div>
+                  <div class="sq-opt" data-val="sicepat"><span class="sq-courier-logo sicepat">SC</span> SiCepat</div>
+                  <div class="sq-opt" data-val="anteraja"><span class="sq-courier-logo anteraja">ANT</span> Anteraja</div>
+                  <div class="sq-opt" data-val="gosend"><span class="sq-courier-logo gojek">GO</span> Gojek Gosend</div>
+                  <div class="sq-opt" data-val="grab_express"><span class="sq-courier-logo grab">GRB</span> Grab Express</div>
                 </div>
               </div>
             </div>
@@ -244,7 +244,7 @@ function injectUI() {
     opt.addEventListener('click', () => {
       selOpts.querySelectorAll('.sq-opt').forEach(o => o.classList.remove('sq-opt-active'));
       opt.classList.add('sq-opt-active');
-      selVal.textContent = opt.dataset.val + ' ▾';
+      selVal.innerHTML = opt.innerHTML + ' ▾';
       selOpts.style.display = 'none';
     });
   });
@@ -258,7 +258,7 @@ function injectUI() {
     opt.addEventListener('click', () => {
       oqOpts.querySelectorAll('.sq-opt').forEach(o => o.classList.remove('sq-opt-active'));
       opt.classList.add('sq-opt-active');
-      oqVal.textContent = opt.textContent + ' ▾';
+      oqVal.innerHTML = opt.innerHTML + ' ▾';
       oqOpts.style.display = 'none';
     });
   });
