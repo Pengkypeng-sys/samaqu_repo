@@ -3,18 +3,22 @@
 const KEY_URL   = 'samaqu_api_url';
 const KEY_TOKEN = 'samaqu_token';
 
-let panel      = null;
-let templates  = [];
-let activeTab  = 'autotext';
-let activeCat  = null;
+let panel     = null;
+let templates = [];
+let activeCat = null;
 
-// ── Inject UI ────────────────────────────────────────────────────────────────
+// Wrapper aman untuk chrome.storage (hindari "context invalidated" error)
+async function storageGet(keys) {
+  try { return await chrome.storage.local.get(keys); }
+  catch (_) { return {}; }
+}
+
 function injectUI() {
   if (document.getElementById('samaqu-btn')) return;
 
   const btn = document.createElement('div');
   btn.id = 'samaqu-btn';
-  btn.innerHTML = 'SQ';
+  btn.innerHTML = '<span>SQ</span>';
   btn.title = 'SAMAQU';
   btn.addEventListener('click', togglePanel);
   document.body.appendChild(btn);
@@ -23,124 +27,151 @@ function injectUI() {
   panel.id = 'samaqu-panel';
   panel.innerHTML = `
     <div id="sq-header">
-      <span id="sq-logo">⌨️ SAMAQU</span>
-      <button id="sq-close" title="Tutup">✕</button>
-    </div>
-
-    <!-- AUTO TEXT -->
-    <div id="sq-autotext" class="sq-page">
-      <div id="sq-search-wrap">
-        <input id="sq-search" type="text" placeholder="🔍  Cari template...">
+      <div id="sq-header-left">
+        <div id="sq-avatar">SQ</div>
+        <div>
+          <div id="sq-logo">SAMAQU</div>
+          <div id="sq-sub">Template CS Assistant</div>
+        </div>
       </div>
-      <div id="sq-tabs"></div>
-      <div id="sq-list"></div>
+      <button id="sq-close">✕</button>
     </div>
 
-    <!-- INVOICE -->
-    <div id="sq-invoice" class="sq-page" style="display:none">
-      <div id="sq-inv-form">
-        <div class="sq-row">
-          <div class="sq-field"><label>Pembeli</label><input id="inv-buyer" placeholder="Nama pembeli"></div>
-          <div class="sq-field"><label>Produk</label><input id="inv-product" placeholder="Nama produk"></div>
+    <div id="sq-body">
+      <!-- AUTO TEXT -->
+      <div id="sq-autotext" class="sq-page">
+        <div class="sq-search-wrap">
+          <span class="sq-search-icon">🔍</span>
+          <input id="sq-search" type="text" placeholder="Cari template...">
         </div>
-        <div class="sq-row">
-          <div class="sq-field"><label>Qty</label><input id="inv-qty" type="number" placeholder="1" value="1"></div>
-          <div class="sq-field"><label>Harga (Rp)</label><input id="inv-price" type="number" placeholder="0"></div>
-        </div>
-        <div class="sq-row">
-          <div class="sq-field">
-            <label>Jasa Kirim</label>
-            <select id="inv-shipping">
-              <option>Gojek Instant</option>
-              <option>J&amp;T Express</option>
-              <option>Lalamove</option>
-              <option>SiCepat</option>
-              <option>JNE</option>
-              <option>Anteraja</option>
-              <option>Shopee Express</option>
-            </select>
+        <div id="sq-cats"></div>
+        <div id="sq-list"></div>
+        <div id="sq-status"></div>
+      </div>
+
+      <!-- INVOICE -->
+      <div id="sq-invoice" class="sq-page" style="display:none">
+        <div class="sq-section-title">🧾 Buat Invoice</div>
+        <div class="sq-form">
+          <div class="sq-row2">
+            <div class="sq-field">
+              <label>Nama Pembeli</label>
+              <input id="inv-buyer" type="text" placeholder="Contoh: Budi Santoso">
+            </div>
+            <div class="sq-field">
+              <label>Nama Produk</label>
+              <input id="inv-product" type="text" placeholder="Contoh: Kaos Polos">
+            </div>
           </div>
-          <div class="sq-field"><label>Ongkir (Rp)</label><input id="inv-ongkir" type="number" placeholder="0"></div>
+          <div class="sq-row2">
+            <div class="sq-field">
+              <label>Qty</label>
+              <input id="inv-qty" type="number" placeholder="1" value="1" min="1">
+            </div>
+            <div class="sq-field">
+              <label>Harga Satuan (Rp)</label>
+              <input id="inv-price" type="number" placeholder="0">
+            </div>
+          </div>
+          <div class="sq-row2">
+            <div class="sq-field">
+              <label>Jasa Pengiriman</label>
+              <select id="inv-shipping">
+                <option>Gojek Instant</option>
+                <option>J&amp;T Express</option>
+                <option>Lalamove</option>
+                <option>SiCepat</option>
+                <option>JNE</option>
+                <option>Anteraja</option>
+                <option>Shopee Express</option>
+              </select>
+            </div>
+            <div class="sq-field">
+              <label>Ongkos Kirim (Rp)</label>
+              <input id="inv-ongkir" type="number" placeholder="0">
+            </div>
+          </div>
+          <button id="inv-generate">📋 Generate &amp; Kirim ke Chat</button>
         </div>
-        <button id="inv-generate">📋 Generate &amp; Kirim ke Chat</button>
       </div>
-    </div>
 
-    <!-- PENDING -->
-    <div id="sq-pending" class="sq-page" style="display:none">
-      <div id="sq-pending-list"></div>
-      <div id="sq-pending-empty" style="display:none">Tidak ada order pending 🎉</div>
-    </div>
+      <!-- ONGKIR -->
+      <div id="sq-ongkir" class="sq-page sq-center" style="display:none">
+        <div class="sq-dev-icon">🚧</div>
+        <div class="sq-dev-title">Sedang Tahap Development</div>
+        <div class="sq-dev-desc">Fitur Cek Ongkir akan segera hadir.<br>Terima kasih atas kesabarannya 🙏</div>
+      </div>
 
-    <!-- EMOJI -->
-    <div id="sq-emoji" class="sq-page" style="display:none">
-      <div id="sq-emoji-tabs"></div>
-      <div id="sq-emoji-grid"></div>
-    </div>
+      <!-- PENDING -->
+      <div id="sq-pending" class="sq-page" style="display:none">
+        <div class="sq-section-title">⏳ Order Pending</div>
+        <div id="sq-pending-list"></div>
+        <div id="sq-pending-empty" style="display:none" class="sq-empty-state">Tidak ada order pending 🎉</div>
+      </div>
 
-    <!-- ONGKIR -->
-    <div id="sq-ongkir" class="sq-page" style="display:none">
-      <div id="sq-ongkir-body">
-        <div id="sq-ongkir-icon">🚧</div>
-        <div id="sq-ongkir-title">Sedang Tahap Development</div>
-        <div id="sq-ongkir-sub">Fitur Cek Ongkir akan segera hadir.<br>Terima kasih atas kesabarannya 🙏</div>
+      <!-- EMOJI -->
+      <div id="sq-emoji" class="sq-page" style="display:none">
+        <div id="sq-emoji-tabs"></div>
+        <div id="sq-emoji-grid"></div>
       </div>
     </div>
 
     <!-- BOTTOM NAV -->
     <div id="sq-nav">
-      <button class="sq-nav-btn sq-nav-active" data-tab="autotext">📋<span>Auto Text</span></button>
-      <button class="sq-nav-btn" data-tab="invoice">🧾<span>Invoice</span></button>
-      <button class="sq-nav-btn" data-tab="ongkir">🚚<span>Ongkir</span></button>
-      <button class="sq-nav-btn" data-tab="pending">⏳<span>Pending</span></button>
-      <button class="sq-nav-btn" data-tab="emoji">😊<span>Emoji</span></button>
+      <button class="sq-nav-btn sq-nav-active" data-tab="autotext">
+        <span class="sq-nav-icon">📋</span>
+        <span class="sq-nav-lbl">Auto Text</span>
+      </button>
+      <button class="sq-nav-btn" data-tab="invoice">
+        <span class="sq-nav-icon">🧾</span>
+        <span class="sq-nav-lbl">Invoice</span>
+      </button>
+      <button class="sq-nav-btn" data-tab="ongkir">
+        <span class="sq-nav-icon">🚚</span>
+        <span class="sq-nav-lbl">Ongkir</span>
+      </button>
+      <button class="sq-nav-btn" data-tab="pending">
+        <span class="sq-nav-icon">⏳</span>
+        <span class="sq-nav-lbl">Pending</span>
+      </button>
+      <button class="sq-nav-btn" data-tab="emoji">
+        <span class="sq-nav-icon">😊</span>
+        <span class="sq-nav-lbl">Emoji</span>
+      </button>
     </div>
-
-    <div id="sq-status"></div>
   `;
   document.body.appendChild(panel);
 
-  // Close
   panel.querySelector('#sq-close').addEventListener('click', () => panel.style.display = 'none');
-
-  // Nav tabs
-  panel.querySelectorAll('.sq-nav-btn').forEach(b => {
-    b.addEventListener('click', () => switchTab(b.dataset.tab));
-  });
-
-  // Search
+  panel.querySelectorAll('.sq-nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
   panel.querySelector('#sq-search').addEventListener('input', e => renderList(e.target.value.toLowerCase()));
-
-  // Invoice generate
   panel.querySelector('#inv-generate').addEventListener('click', generateInvoice);
 
   loadTemplates();
   setupEmoji();
 }
 
-// ── Tab switching ─────────────────────────────────────────────────────────────
 function switchTab(tab) {
-  activeTab = tab;
   panel.querySelectorAll('.sq-page').forEach(p => p.style.display = 'none');
   panel.querySelectorAll('.sq-nav-btn').forEach(b => b.classList.remove('sq-nav-active'));
-  panel.querySelector(`#sq-${tab}`).style.display = 'flex';
+  panel.querySelector(`#sq-${tab}`).style.display = tab === 'autotext' ? 'flex' : (tab === 'ongkir' || tab === 'emoji' ? 'flex' : 'flex');
   panel.querySelector(`[data-tab="${tab}"]`).classList.add('sq-nav-active');
   if (tab === 'pending') loadPending();
 }
 
-// ── Toggle panel ──────────────────────────────────────────────────────────────
 function togglePanel() {
   if (!panel) return;
-  panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
-  if (panel.style.display === 'flex') loadTemplates();
+  const show = panel.style.display !== 'flex';
+  panel.style.display = show ? 'flex' : 'none';
+  if (show) loadTemplates();
 }
 
-// ── Templates ─────────────────────────────────────────────────────────────────
 async function loadTemplates() {
   const status = panel.querySelector('#sq-status');
-  const stored = await chrome.storage.local.get([KEY_URL]);
+  const stored = await storageGet([KEY_URL]);
   const apiUrl = stored[KEY_URL] || '';
-  if (!apiUrl) { status.textContent = '⚠️ API URL belum diisi'; return; }
+  if (!apiUrl) { status.textContent = '⚠️ API URL belum diisi — klik ikon SQ di toolbar Chrome'; return; }
+  status.textContent = '';
   try {
     const res = await fetch(`${apiUrl}/templates`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -149,28 +180,27 @@ async function loadTemplates() {
       category: item.name || item.category?.name || 'Lainnya',
       items: (item.templates || []).map(t => t.content || t.text || '')
     }));
-    status.textContent = '';
-    renderTabs();
+    renderCats();
     renderList('');
   } catch (e) {
-    status.textContent = `❌ ${e.message}`;
+    status.textContent = `❌ Gagal memuat: ${e.message}`;
   }
 }
 
-function renderTabs() {
-  const tabs = panel.querySelector('#sq-tabs');
-  tabs.innerHTML = '';
+function renderCats() {
+  const el = panel.querySelector('#sq-cats');
+  el.innerHTML = '';
   templates.forEach((cat, i) => {
-    const t = document.createElement('button');
-    t.className = 'sq-cat' + (i === 0 ? ' sq-cat-active' : '');
-    t.textContent = cat.category;
-    t.addEventListener('click', () => {
-      tabs.querySelectorAll('.sq-cat').forEach(x => x.classList.remove('sq-cat-active'));
-      t.classList.add('sq-cat-active');
+    const b = document.createElement('button');
+    b.className = 'sq-cat' + (i === 0 ? ' sq-cat-active' : '');
+    b.textContent = cat.category;
+    b.addEventListener('click', () => {
+      el.querySelectorAll('.sq-cat').forEach(x => x.classList.remove('sq-cat-active'));
+      b.classList.add('sq-cat-active');
       activeCat = cat.category;
       renderList(panel.querySelector('#sq-search').value.toLowerCase());
     });
-    tabs.appendChild(t);
+    el.appendChild(b);
   });
   if (templates.length) activeCat = templates[0].category;
 }
@@ -183,54 +213,44 @@ function renderList(query) {
   cats.forEach(cat => {
     cat.items.filter(t => !query || t.toLowerCase().includes(query)).forEach(text => {
       found++;
-      const item = document.createElement('div');
-      item.className = 'sq-item';
-      item.textContent = text;
-      item.addEventListener('click', () => { insertText(text); });
-      list.appendChild(item);
+      const d = document.createElement('div');
+      d.className = 'sq-item';
+      d.textContent = text;
+      d.addEventListener('click', () => insertText(text));
+      list.appendChild(d);
     });
   });
   if (!found) {
-    const e = document.createElement('div');
-    e.className = 'sq-empty';
-    e.textContent = query ? 'Tidak ditemukan' : 'Belum ada template';
-    list.appendChild(e);
+    const d = document.createElement('div');
+    d.className = 'sq-empty-state';
+    d.textContent = query ? '😕 Template tidak ditemukan' : 'Belum ada template';
+    list.appendChild(d);
   }
 }
 
-// ── Invoice ───────────────────────────────────────────────────────────────────
 function generateInvoice() {
-  const buyer    = panel.querySelector('#inv-buyer').value.trim() || '-';
-  const product  = panel.querySelector('#inv-product').value.trim() || '-';
-  const qty      = parseInt(panel.querySelector('#inv-qty').value) || 1;
-  const price    = parseFloat(panel.querySelector('#inv-price').value) || 0;
-  const ongkir   = parseFloat(panel.querySelector('#inv-ongkir').value) || 0;
-  const shipping = panel.querySelector('#inv-shipping').value;
+  const g = id => panel.querySelector(id);
+  const buyer    = g('#inv-buyer').value.trim() || '-';
+  const product  = g('#inv-product').value.trim() || '-';
+  const qty      = parseInt(g('#inv-qty').value) || 1;
+  const price    = parseFloat(g('#inv-price').value) || 0;
+  const ongkir   = parseFloat(g('#inv-ongkir').value) || 0;
+  const shipping = g('#inv-shipping').value;
   const fmt = v => new Intl.NumberFormat('id-ID').format(v);
   const total = price * qty + ongkir;
-  const text = `🧾 *INVOICE SAMAQU*
-Pembeli  : ${buyer}
-Produk   : ${product}
-Qty      : ${qty} pcs
-Subtotal : Rp ${fmt(price * qty)}
-Kurir    : ${shipping}
-Ongkir   : Rp ${fmt(ongkir)}
-*TOTAL   : Rp ${fmt(total)}*`;
-  insertText(text);
+  insertText(`🧾 *INVOICE SAMAQU*\nPembeli  : ${buyer}\nProduk   : ${product}\nQty      : ${qty} pcs\nSubtotal : Rp ${fmt(price * qty)}\nKurir    : ${shipping}\nOngkir   : Rp ${fmt(ongkir)}\n*TOTAL   : Rp ${fmt(total)}*`);
 }
 
-// ── Pending orders ────────────────────────────────────────────────────────────
 async function loadPending() {
-  const listEl = panel.querySelector('#sq-pending-list');
+  const listEl  = panel.querySelector('#sq-pending-list');
   const emptyEl = panel.querySelector('#sq-pending-empty');
-  listEl.innerHTML = '<div class="sq-empty">Memuat...</div>';
+  listEl.innerHTML = '<div class="sq-empty-state">⏳ Memuat order...</div>';
   emptyEl.style.display = 'none';
-
-  const stored = await chrome.storage.local.get([KEY_URL, KEY_TOKEN]);
+  const stored = await storageGet([KEY_URL, KEY_TOKEN]);
   const apiUrl = stored[KEY_URL] || '';
   const token  = stored[KEY_TOKEN] || '';
   if (!apiUrl || !token) {
-    listEl.innerHTML = '<div class="sq-empty">⚠️ Isi API URL & JWT Token di pengaturan</div>';
+    listEl.innerHTML = '<div class="sq-empty-state">⚠️ Isi API URL &amp; JWT Token di pengaturan (klik ikon SQ)</div>';
     return;
   }
   try {
@@ -241,41 +261,45 @@ async function loadPending() {
     if (!orders.length) { emptyEl.style.display = 'block'; return; }
     orders.forEach(order => {
       const el = document.createElement('div');
-      el.className = 'sq-pending-item';
-      el.innerHTML = `<div class="sq-pending-name">${order.buyerName || 'Pembeli'} <span class="sq-badge">Pending</span></div>
-        <div class="sq-pending-sub">Order #${order.id}</div>
-        <button class="sq-pending-btn">Minta Bukti Transfer</button>`;
-      el.querySelector('.sq-pending-btn').addEventListener('click', () => {
+      el.className = 'sq-order-card';
+      el.innerHTML = `
+        <div class="sq-order-top">
+          <span class="sq-order-name">${order.buyerName || 'Pembeli'}</span>
+          <span class="sq-badge">Pending</span>
+        </div>
+        <div class="sq-order-id">Order #${order.id}</div>
+        <button class="sq-order-btn">💬 Minta Bukti Transfer</button>`;
+      el.querySelector('.sq-order-btn').addEventListener('click', () => {
         const name = order.buyerName || 'Kakak';
         insertText(`Halo ${name} 😊\n\nPesanan #${order.id} sudah kami terima ya kak.\nMohon kirimkan bukti pembayaran ke sini agar pesanan segera kami proses.\n\nTerima kasih! 🙏`);
       });
       listEl.appendChild(el);
     });
   } catch (e) {
-    listEl.innerHTML = `<div class="sq-empty">❌ ${e.message}</div>`;
+    listEl.innerHTML = `<div class="sq-empty-state">❌ ${e.message}</div>`;
   }
 }
 
-// ── Emoji ─────────────────────────────────────────────────────────────────────
 const EMOJI_CATS = {
-  '😊': ['😊','😍','😂','🤣','😁','😄','🥰','😘','🤗','🤩','😎','🥳','😜','😝','😛','🤑','😏','😒','🙄','😔','😢','😭','😤','😠','🤬','🤯','😳','😱','😰','🤔','😶','😐','😬','🙃','😴','😵','🥴','🤢','🤧','😷','😈','👿','💀','👻','😺','😸','😹','😻'],
-  '👋': ['👋','🤚','✋','👌','✌️','🤞','🤟','👈','👉','👆','👇','👍','👎','✊','👊','👏','🙌','🤝','🙏','💪','🤳','💅'],
-  '❤️': ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝'],
-  '🎉': ['🎉','🎊','🎈','🎁','🎀','🏆','🥇','🥈','🥉','🎵','🎶','✨','🌟','💫','⭐','🌈','🎆','🎇'],
-  '💼': ['💰','💵','💸','💳','📈','📉','📊','💼','📦','📋','📌','✂️','📎','✏️','📝','📱','💻','🖥️','📧','📨','🔔'],
-  '🛍️': ['🛍️','🛒','📦','🚚','🏪','🏷️','💎','💍','👑','👗','👘','👙','👚','👛','👜','👝','🎒','👟','👠','👡','✅','🆗','🆕'],
-  '🍎': ['🍎','🍊','🍋','🍇','🍓','🍒','🍑','🍍','🥭','🥝','🍅','🥑','🥦','🌽','🍔','🍟','🍕','🍜','🍣','🍱','🍿','☕','🧃','🥤'],
-  '🏠': ['🏠','🏡','🏢','🏪','🏬','🚗','🚕','✈️','🚂','🚢','🌍','🌏','🗺️','🏖️','⛰️','🌄','🌃','🏙️'],
+  '😊 Ekspresi': ['😊','😍','😂','🤣','😁','😄','🥰','😘','🤗','🤩','😎','🥳','😜','😝','😛','🤑','😏','😒','🙄','😔','😢','😭','😤','😠','🤬','🤯','😳','😱','😰','🤔','😶','😐','😬','🙃','😴','😵','🥴','🤢','🤧','😷','😈','💀','👻'],
+  '👋 Gestur':   ['👋','🤚','✋','👌','✌️','🤞','🤟','👈','👉','👆','👇','👍','👎','✊','👊','👏','🙌','🤝','🙏','💪','💅'],
+  '❤️ Hati':     ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝'],
+  '🎉 Selebrasi':['🎉','🎊','🎈','🎁','🎀','🏆','🥇','🥈','🥉','🎵','🎶','✨','🌟','💫','⭐','🌈','🎆','🎇'],
+  '💼 Bisnis':   ['💰','💵','💸','💳','📈','📉','📊','💼','📦','📋','📌','✂️','📎','✏️','📝','📱','💻','📧','🔔'],
+  '🛍️ Belanja':  ['🛍️','🛒','📦','🚚','🏪','🏷️','💎','💍','👑','👗','👚','👛','👜','👝','🎒','👟','✅','🆗','🆕'],
+  '🍎 Makanan':  ['🍎','🍊','🍋','🍇','🍓','🍒','🍍','🥭','🥝','🍅','🥑','🥦','🌽','🍔','🍟','🍕','🍜','🍣','🍱','🍿','☕','🥤'],
+  '🏠 Tempat':   ['🏠','🏡','🏢','🏪','🏬','🚗','🚕','✈️','🚂','🚢','🌍','🌏','🗺️','🏖️','⛰️','🌃','🏙️'],
 };
 
 function setupEmoji() {
   const tabsEl = panel.querySelector('#sq-emoji-tabs');
-  const gridEl = panel.querySelector('#sq-emoji-grid');
   let first = true;
-  Object.entries(EMOJI_CATS).forEach(([icon, emojis]) => {
+  Object.entries(EMOJI_CATS).forEach(([label, emojis]) => {
+    const icon = label.split(' ')[0];
     const tab = document.createElement('button');
     tab.className = 'sq-etab' + (first ? ' sq-etab-active' : '');
     tab.textContent = icon;
+    tab.title = label;
     tab.addEventListener('click', () => {
       tabsEl.querySelectorAll('.sq-etab').forEach(t => t.classList.remove('sq-etab-active'));
       tab.classList.add('sq-etab-active');
@@ -290,29 +314,27 @@ function renderEmoji(emojis) {
   const grid = panel.querySelector('#sq-emoji-grid');
   grid.innerHTML = '';
   emojis.forEach(e => {
-    const btn = document.createElement('button');
-    btn.className = 'sq-emoji';
-    btn.textContent = e;
-    btn.addEventListener('click', () => insertText(e));
-    grid.appendChild(btn);
+    const b = document.createElement('button');
+    b.className = 'sq-emoji';
+    b.textContent = e;
+    b.addEventListener('click', () => insertText(e));
+    grid.appendChild(b);
   });
 }
 
-// ── Insert text ke WA ─────────────────────────────────────────────────────────
 function insertText(text) {
   const input = document.querySelector('[contenteditable="true"][data-tab="10"]')
              || document.querySelector('footer [contenteditable="true"]')
              || document.querySelector('[contenteditable="true"]');
-  if (!input) { alert('Klik dulu di kolom chat WhatsApp'); return; }
+  if (!input) { alert('Klik dulu di kolom chat WhatsApp sebelum memilih template'); return; }
   input.focus();
   document.execCommand('insertText', false, text);
   panel.style.display = 'none';
 }
 
-// ── Wait for WA to load ───────────────────────────────────────────────────────
-const observer = new MutationObserver(() => {
+const obs = new MutationObserver(() => {
   if (document.querySelector('footer') || document.querySelector('[data-tab="10"]')) injectUI();
 });
-observer.observe(document.body, { childList: true, subtree: true });
+obs.observe(document.body, { childList: true, subtree: true });
 if (document.readyState === 'complete') injectUI();
 else window.addEventListener('load', injectUI);
