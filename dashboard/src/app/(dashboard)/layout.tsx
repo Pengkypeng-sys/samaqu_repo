@@ -10,12 +10,12 @@ import {
 } from 'lucide-react';
 
 const nav = [
-  { href: '/orders',    label: 'Order',      icon: ShoppingCart, color: 'text-blue-500' },
-  { href: '/payments',  label: 'Pembayaran', icon: CreditCard,   color: 'text-green-500' },
-  { href: '/templates', label: 'Template',   icon: FileText,     color: 'text-purple-500' },
-  { href: '/products',  label: 'Produk',     icon: Package,      color: 'text-orange-500' },
-  { href: '/reports',   label: 'Laporan',    icon: BarChart2,    color: 'text-pink-500' },
-  { href: '/settings',  label: 'Pengaturan', icon: Settings2,    color: 'text-gray-500' },
+  { href: '/orders',    label: 'Order',      icon: ShoppingCart, bg: 'bg-blue-500',   iconColor: 'text-white' },
+  { href: '/payments',  label: 'Pembayaran', icon: CreditCard,   bg: 'bg-emerald-500', iconColor: 'text-white' },
+  { href: '/templates', label: 'Template',   icon: FileText,     bg: 'bg-violet-500', iconColor: 'text-white' },
+  { href: '/products',  label: 'Produk',     icon: Package,      bg: 'bg-orange-500', iconColor: 'text-white' },
+  { href: '/reports',   label: 'Laporan',    icon: BarChart2,    bg: 'bg-rose-500',   iconColor: 'text-white' },
+  { href: '/settings',  label: 'Pengaturan', icon: Settings2,    bg: 'bg-slate-500',  iconColor: 'text-white' },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -45,21 +45,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Nav */}
         <nav className="flex-1 p-3 space-y-1">
-          {nav.map(({ href, label, icon: Icon, color }) => {
+          {nav.map(({ href, label, icon: Icon, bg, iconColor }) => {
             const active = pathname.startsWith(href);
             return (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
                   active
-                    ? 'bg-blue-50 text-blue-700 border border-blue-100'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                 )}
               >
-                <Icon size={16} className={active ? 'text-blue-600' : color} />
+                <span className={cn(
+                  'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm transition-all',
+                  active ? bg + ' shadow-md' : bg + ' opacity-80',
+                )}>
+                  <Icon size={14} className={iconColor} />
+                </span>
                 {label}
+                {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500" />}
               </Link>
             );
           })}
