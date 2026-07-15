@@ -13,7 +13,7 @@
 
 #samaqu-panel {
   position: fixed; bottom: 140px; right: 20px;
-  width: 360px; height: 500px;
+  width: 420px; height: 580px;
   background: #fff; border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0,0,0,.2);
   z-index: 9998; display: none; flex-direction: column;
@@ -137,6 +137,18 @@
   font-weight: 600; cursor: pointer; font-family: inherit;
 }
 .sq-pending-btn:hover { background: #1558A0; }
+
+/* ── ONGKIR ────────────────────────────────────────────── */
+#sq-ongkir-body {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 32px;
+}
+#sq-ongkir-icon { font-size: 52px; margin-bottom: 16px; }
+#sq-ongkir-title {
+  font-size: 16px; font-weight: 700; color: #1D4ED8;
+  margin-bottom: 8px; text-align: center;
+}
+#sq-ongkir-sub { font-size: 13px; color: #6B7280; text-align: center; line-height: 1.6; }
 
 /* ── EMOJI ─────────────────────────────────────────────── */
 #sq-emoji-tabs {

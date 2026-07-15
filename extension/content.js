@@ -78,10 +78,20 @@ function injectUI() {
       <div id="sq-emoji-grid"></div>
     </div>
 
+    <!-- ONGKIR -->
+    <div id="sq-ongkir" class="sq-page" style="display:none">
+      <div id="sq-ongkir-body">
+        <div id="sq-ongkir-icon">🚧</div>
+        <div id="sq-ongkir-title">Sedang Tahap Development</div>
+        <div id="sq-ongkir-sub">Fitur Cek Ongkir akan segera hadir.<br>Terima kasih atas kesabarannya 🙏</div>
+      </div>
+    </div>
+
     <!-- BOTTOM NAV -->
     <div id="sq-nav">
       <button class="sq-nav-btn sq-nav-active" data-tab="autotext">📋<span>Auto Text</span></button>
       <button class="sq-nav-btn" data-tab="invoice">🧾<span>Invoice</span></button>
+      <button class="sq-nav-btn" data-tab="ongkir">🚚<span>Ongkir</span></button>
       <button class="sq-nav-btn" data-tab="pending">⏳<span>Pending</span></button>
       <button class="sq-nav-btn" data-tab="emoji">😊<span>Emoji</span></button>
     </div>
