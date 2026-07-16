@@ -234,30 +234,34 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
             val fmt = NumberFormat.getInstance(Locale("id", "ID"))
             val subtotal = price * qty
             val total    = subtotal + ongkir
-            val sep = "─────────────────────"
-            val prefs = com.samaqu.keyboard.data.Prefs(this)
-            val storeName = prefs.storeName.ifBlank { "SAMAQU" }
-            val footer    = prefs.invoiceFooter
+            val prefs2 = com.samaqu.keyboard.data.Prefs(this)
+            val sep       = prefs2.invoiceSeparator
+            val storeName = prefs2.storeName.ifBlank { "SAMAQU" }
+            val footer    = prefs2.invoiceFooter
+            val rawHeader = prefs2.invoiceHeader.ifBlank { "🧾 *INVOICE {store_name}*" }
+            val header    = rawHeader.replace("{store_name}", storeName)
+            val showPricePer = prefs2.invoiceShowPricePer
+            val showSubtotal = prefs2.invoiceShowSubtotal
             val text = buildString {
-                appendLine("🧾 *INVOICE $storeName*")
-                appendLine(sep)
+                appendLine(header)
+                if (sep.isNotBlank()) appendLine(sep)
                 appendLine("Pembeli  : *$buyer*")
                 appendLine("Produk   : $product ($qty pcs)")
-                appendLine("Harga    : Rp ${fmt.format(price)}/pcs")
-                appendLine(sep)
-                appendLine("Subtotal : Rp ${fmt.format(subtotal)}")
+                if (showPricePer) appendLine("Harga    : Rp ${fmt.format(price)}/pcs")
+                if (sep.isNotBlank()) appendLine(sep)
+                if (showSubtotal) appendLine("Subtotal : Rp ${fmt.format(subtotal)}")
                 if (shipping.isNotBlank()) appendLine("Kurir    : $shipping")
                 if (ongkir > 0) appendLine("Ongkir   : Rp ${fmt.format(ongkir)}")
-                appendLine(sep)
+                if (sep.isNotBlank()) appendLine(sep)
                 appendLine("*TOTAL   : Rp ${fmt.format(total)}*")
                 if (selectedBank.isNotBlank()) {
-                    appendLine(sep)
+                    if (sep.isNotBlank()) appendLine(sep)
                     appendLine("💳 *Transfer via $selectedBank*")
                     if (bankNo.isNotBlank())   appendLine("No. Rek  : $bankNo")
                     if (bankName.isNotBlank()) appendLine("A/N      : $bankName")
                 }
                 if (footer.isNotBlank()) {
-                    appendLine(sep)
+                    if (sep.isNotBlank()) appendLine(sep)
                     append(footer)
                 }
             }
@@ -275,9 +279,15 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
 
     override fun onStartInputView(info: android.view.inputmethod.EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
-        // Default huruf besar saat keyboard muncul
-        caps = true
-        qwerty?.isShifted = true
+        val inputClass = info.inputType and android.text.InputType.TYPE_MASK_CLASS
+        val isNumeric = inputClass == android.text.InputType.TYPE_CLASS_NUMBER ||
+                        inputClass == android.text.InputType.TYPE_CLASS_PHONE
+        if (isNumeric) {
+            keyboardView?.keyboard = symbols
+        } else {
+            caps = true
+            qwerty?.isShifted = true
+        }
         keyboardView?.invalidateAllKeys()
     }
 

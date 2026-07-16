@@ -39,6 +39,10 @@ class TemplateRepository(ctx: Context) {
             cfg["biteship_key"]?.takeIf { it.isNotBlank() }?.let { prefs.biteshipKey = it }
             cfg["store_name"]?.takeIf { it.isNotBlank() }?.let { prefs.storeName = it }
             cfg["invoice_footer"]?.let { prefs.invoiceFooter = it }
+            cfg["invoice_header"]?.let { prefs.invoiceHeader = it }
+            cfg["invoice_separator"]?.let { prefs.invoiceSeparator = it }
+            cfg["invoice_show_price_per"]?.let { prefs.invoiceShowPricePer = it != "0" }
+            cfg["invoice_show_subtotal"]?.let { prefs.invoiceShowSubtotal = it != "0" }
         }
     }
 }

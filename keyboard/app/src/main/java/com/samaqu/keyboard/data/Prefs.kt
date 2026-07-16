@@ -44,4 +44,20 @@ class Prefs(ctx: Context) {
     var invoiceFooter: String
         get() = sp.getString("invoice_footer", "") ?: ""
         set(v) = sp.edit { putString("invoice_footer", v) }
+
+    var invoiceHeader: String
+        get() = sp.getString("invoice_header", "") ?: ""
+        set(v) = sp.edit { putString("invoice_header", v) }
+
+    var invoiceSeparator: String
+        get() = sp.getString("invoice_separator", "─────────────────────") ?: "─────────────────────"
+        set(v) = sp.edit { putString("invoice_separator", v) }
+
+    var invoiceShowPricePer: Boolean
+        get() = sp.getString("invoice_show_price_per", "1") != "0"
+        set(v) = sp.edit { putString("invoice_show_price_per", if (v) "1" else "0") }
+
+    var invoiceShowSubtotal: Boolean
+        get() = sp.getString("invoice_show_subtotal", "1") != "0"
+        set(v) = sp.edit { putString("invoice_show_subtotal", if (v) "1" else "0") }
 }

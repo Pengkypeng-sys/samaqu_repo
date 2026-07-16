@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#FFE8ECF0">
+    android:background="#FF1A1F2E">
 
     <!-- ══ TOOLBAR ══ -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
         android:orientation="horizontal"
-        android:background="#FFFFFFFF"
+        android:background="#FF1D4ED8"
         android:gravity="center_vertical"
         android:elevation="2dp">
 
@@ -22,7 +22,7 @@
             <ImageView android:layout_width="18dp" android:layout_height="18dp"
                 android:src="@drawable/ic_tb_invoice" android:layout_marginBottom="2dp"/>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Invoice" android:textColor="#FF444444" android:textSize="7.5sp"/>
+                android:text="Invoice" android:textColor="#CCFFFFFF" android:textSize="7.5sp"/>
         </LinearLayout>
 
         <View android:layout_width="1dp" android:layout_height="22dp" android:background="#FFDDDDDD"/>
@@ -35,7 +35,7 @@
             <ImageView android:layout_width="18dp" android:layout_height="18dp"
                 android:src="@drawable/ic_tb_ongkir" android:layout_marginBottom="2dp"/>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Ongkir" android:textColor="#FF444444" android:textSize="7.5sp"/>
+                android:text="Ongkir" android:textColor="#CCFFFFFF" android:textSize="7.5sp"/>
         </LinearLayout>
 
         <View android:layout_width="1dp" android:layout_height="22dp" android:background="#FFDDDDDD"/>
@@ -61,7 +61,7 @@
             <ImageView android:layout_width="18dp" android:layout_height="18dp"
                 android:src="@drawable/ic_tb_pending" android:layout_marginBottom="2dp"/>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Pending" android:textColor="#FF444444" android:textSize="7.5sp"/>
+                android:text="Pending" android:textColor="#CCFFFFFF" android:textSize="7.5sp"/>
         </LinearLayout>
 
         <View android:layout_width="1dp" android:layout_height="22dp" android:background="#FFDDDDDD"/>
@@ -74,7 +74,7 @@
             <ImageView android:layout_width="18dp" android:layout_height="18dp"
                 android:src="@drawable/ic_tb_dashboard" android:layout_marginBottom="2dp"/>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Dashboard" android:textColor="#FF444444" android:textSize="7.5sp"/>
+                android:text="Dashboard" android:textColor="#CCFFFFFF" android:textSize="7.5sp"/>
         </LinearLayout>
 
         <View android:layout_width="1dp" android:layout_height="22dp" android:background="#FFDDDDDD"/>
@@ -88,7 +88,7 @@
                 android:src="@drawable/ic_tb_sync" android:layout_marginBottom="2dp"/>
             <TextView android:id="@+id/syncStatus"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Sync" android:textColor="#FF16A34A" android:textSize="7.5sp"/>
+                android:text="Sync" android:textColor="#CCFFFFFF" android:textSize="7.5sp"/>
         </LinearLayout>
 
     </LinearLayout>
@@ -415,11 +415,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:keyBackground="@drawable/key_bg"
-        android:keyTextColor="#FF1C1C1E"
+        android:keyTextColor="#FFFFFFFF"
         android:keyTextSize="@dimen/key_text_size"
-        android:shadowColor="#00000000"
+        android:shadowColor="#661D4ED8"
         android:shadowRadius="0"
-        android:background="#FFD1D5DB"
+        android:background="#FF1A1F2E"
         android:paddingTop="6dp"
         android:paddingBottom="8dp"
         android:paddingStart="3dp"

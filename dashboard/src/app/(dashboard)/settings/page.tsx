@@ -201,6 +201,64 @@ export default function SettingsPage() {
         </Button>
       </div>
 
+      {/* ── Format Invoice ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <div className="flex items-center gap-2 text-gray-700 font-semibold text-sm">
+          🧾 Format Invoice
+        </div>
+        <p className="text-xs text-gray-400 -mt-2">
+          Atur tampilan teks invoice yang dikirim ke pembeli.
+        </p>
+        <div className="space-y-3">
+          <div>
+            <Label className="text-xs text-gray-500 mb-1 block">Header Invoice</Label>
+            <Input
+              value={config.invoice_header || ''}
+              onChange={e => setConfig(c => ({ ...c, invoice_header: e.target.value }))}
+              placeholder="🧾 *INVOICE {store_name}*"
+              className="text-sm font-mono"
+            />
+            <p className="text-xs text-gray-400 mt-1">Gunakan <code className="bg-gray-100 px-1 rounded">{'{store_name}'}</code> untuk nama toko</p>
+          </div>
+          <div>
+            <Label className="text-xs text-gray-500 mb-1 block">Separator Baris</Label>
+            <select
+              value={config.invoice_separator || '─────────────────────'}
+              onChange={e => setConfig(c => ({ ...c, invoice_separator: e.target.value }))}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono bg-white"
+            >
+              <option value="─────────────────────">─────────────────────</option>
+              <option value="━━━━━━━━━━━━━━━━━━━━━">━━━━━━━━━━━━━━━━━━━━━</option>
+              <option value="=====================">=====================</option>
+              <option value="---------------------">---------------------</option>
+              <option value="">Tanpa separator</option>
+            </select>
+          </div>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+              <input type="checkbox"
+                checked={config.invoice_show_price_per !== '0'}
+                onChange={e => setConfig(c => ({ ...c, invoice_show_price_per: e.target.checked ? '1' : '0' }))}
+                className="rounded"
+              />
+              Tampilkan harga/pcs
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+              <input type="checkbox"
+                checked={config.invoice_show_subtotal !== '0'}
+                onChange={e => setConfig(c => ({ ...c, invoice_show_subtotal: e.target.checked ? '1' : '0' }))}
+                className="rounded"
+              />
+              Tampilkan subtotal
+            </label>
+          </div>
+        </div>
+        <Button onClick={saveConfig} size="sm" disabled={savingConfig} variant="outline" className="gap-1">
+          {savingConfig ? <Loader2 size={13} className="animate-spin" /> : null}
+          Simpan Format Invoice
+        </Button>
+      </div>
+
       {/* ── APK Update ── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
         <div className="flex items-center gap-2 text-gray-700 font-semibold text-sm">
