@@ -40,15 +40,18 @@ function injectUI() {
     <div id="sq-body">
       <!-- AUTO TEXT -->
       <div id="sq-autotext" class="sq-page">
-        <div class="sq-at-header">
-          <span class="sq-at-title">💬 Template Pesan</span>
-          <span id="sq-tpl-count" class="sq-at-count"></span>
-        </div>
         <div class="sq-search-wrap">
           <span class="sq-search-icon">🔍</span>
           <input id="sq-search" type="text" placeholder="Cari template...">
         </div>
-        <div id="sq-cats"></div>
+        <div id="sq-cat-wrap">
+          <button id="sq-cat-btn">
+            <span id="sq-cat-label">Pilih Kategori</span>
+            <span id="sq-cat-count" class="sq-cat-badge"></span>
+            <span class="sq-cat-arrow">▾</span>
+          </button>
+          <div id="sq-cat-dropdown" style="display:none"></div>
+        </div>
         <div id="sq-list"></div>
         <div id="sq-status"></div>
       </div>
@@ -314,21 +317,45 @@ async function loadTemplates() {
 }
 
 function renderCats() {
-  const el = panel.querySelector('#sq-cats');
-  el.innerHTML = '';
-  templates.forEach((cat, i) => {
-    const b = document.createElement('button');
-    b.className = 'sq-cat' + (i === 0 ? ' sq-cat-active' : '');
-    b.innerHTML = `${cat.category} <span class="sq-cat-n">${cat.items.length}</span>`;
-    b.addEventListener('click', () => {
-      el.querySelectorAll('.sq-cat').forEach(x => x.classList.remove('sq-cat-active'));
-      b.classList.add('sq-cat-active');
-      activeCat = cat.category;
-      renderList(panel.querySelector('#sq-search').value.toLowerCase());
-    });
-    el.appendChild(b);
+  if (!templates.length) return;
+  activeCat = templates[0].category;
+  const btn      = panel.querySelector('#sq-cat-btn');
+  const label    = panel.querySelector('#sq-cat-label');
+  const badge    = panel.querySelector('#sq-cat-count');
+  const dropdown = panel.querySelector('#sq-cat-dropdown');
+
+  function selectCat(cat) {
+    activeCat = cat.category;
+    label.textContent = cat.category;
+    badge.textContent = cat.items.length;
+    dropdown.style.display = 'none';
+    btn.classList.remove('sq-cat-open');
+    renderList(panel.querySelector('#sq-search').value.toLowerCase());
+  }
+
+  // init first
+  selectCat(templates[0]);
+
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    const open = dropdown.style.display !== 'none';
+    dropdown.style.display = open ? 'none' : 'block';
+    btn.classList.toggle('sq-cat-open', !open);
+  };
+
+  dropdown.innerHTML = '';
+  templates.forEach(cat => {
+    const item = document.createElement('div');
+    item.className = 'sq-cat-item';
+    item.innerHTML = `<span>${cat.category}</span><span class="sq-cat-item-n">${cat.items.length}</span>`;
+    item.addEventListener('click', () => selectCat(cat));
+    dropdown.appendChild(item);
   });
-  if (templates.length) activeCat = templates[0].category;
+
+  document.addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    btn.classList.remove('sq-cat-open');
+  });
 }
 
 function renderList(query) {
@@ -352,8 +379,6 @@ function renderList(query) {
       list.appendChild(d);
     });
   });
-  const countEl = panel.querySelector('#sq-tpl-count');
-  if (countEl) countEl.textContent = found ? `${found} template` : '';
   if (!found) {
     const d = document.createElement('div');
     d.className = 'sq-empty-state';
