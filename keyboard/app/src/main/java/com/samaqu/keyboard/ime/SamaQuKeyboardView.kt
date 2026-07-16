@@ -18,28 +18,10 @@ class SamaQuKeyboardView @JvmOverloads constructor(
     fun applyTheme(dark: Boolean) {
         isDark = dark
         setBackgroundColor(if (dark) 0xFF1A1F2E.toInt() else 0xFFD1D5DB.toInt())
-        // Swap key background drawable
         val bgRes = if (dark) com.samaqu.keyboard.R.drawable.key_bg else com.samaqu.keyboard.R.drawable.key_bg_light
-        val bgDrawable = context.getDrawable(bgRes)
         try {
             KeyboardView::class.java.getDeclaredField("mKeyBackground")
-                .also { it.isAccessible = true }.set(this, bgDrawable)
-        } catch (_: Exception) {}
-        // Change text color for regular keys via mKeyTextColor (mPaint gets reset in onDraw)
-        val textColor = if (dark) 0xFFFFFFFF.toInt() else 0xFF1A1F2E.toInt()
-        try {
-            KeyboardView::class.java.getDeclaredField("mKeyTextColor")
-                .also { it.isAccessible = true }.setInt(this, textColor)
-        } catch (_: Exception) {}
-        // Also set mPaint as fallback for some AOSP variants
-        try {
-            val f = KeyboardView::class.java.getDeclaredField("mPaint")
-            f.isAccessible = true
-            (f.get(this) as? Paint)?.color = textColor
-        } catch (_: Exception) {}
-        try {
-            KeyboardView::class.java.getDeclaredField("mDrawPending")
-                .also { it.isAccessible = true }.setBoolean(this, true)
+                .also { it.isAccessible = true }.set(this, context.getDrawable(bgRes))
         } catch (_: Exception) {}
         invalidateAllKeys()
     }
@@ -48,19 +30,25 @@ class SamaQuKeyboardView @JvmOverloads constructor(
     private val facePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFADB5BD.toInt() }
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF868E96.toInt() }
 
-    // Bold label paint for special keys
+    // Paint for special key labels
     private val lblPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0xFFFFFFFF.toInt()
         textAlign = Paint.Align.CENTER
         typeface = Typeface.DEFAULT_BOLD
         isFakeBoldText = true
         strokeWidth = 0.5f
-        textSize = 16f  // set in init
+    }
+
+    // Paint to overdraw regular key labels with correct theme color
+    private val keyLblPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.CENTER
+        typeface = Typeface.DEFAULT_BOLD
+        isFakeBoldText = true
     }
 
     init {
-        lblPaint.textSize = 18f * dp  // dp bukan sp — konsisten di semua layar
-        // Force bold on the internal mPaint that KeyboardView uses for regular keys
+        lblPaint.textSize = 18f * dp
+        keyLblPaint.textSize = 15f * sp
         try {
             val f = KeyboardView::class.java.getDeclaredField("mPaint")
             f.isAccessible = true
@@ -120,60 +108,46 @@ class SamaQuKeyboardView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        // Re-apply mKeyTextColor before buffer renders (KeyboardView may reset it)
-        val textColor = if (isDark) 0xFFFFFFFF.toInt() else 0xFF1A1F2E.toInt()
-        try {
-            KeyboardView::class.java.getDeclaredField("mKeyTextColor")
-                .also { it.isAccessible = true }.setInt(this, textColor)
-            val f = KeyboardView::class.java.getDeclaredField("mPaint")
-            f.isAccessible = true
-            (f.get(this) as? Paint)?.let {
-                it.isFakeBoldText = true
-                it.typeface = android.graphics.Typeface.DEFAULT_BOLD
-                it.color = textColor
-            }
-            KeyboardView::class.java.getDeclaredField("mDrawPending")
-                .also { it.isAccessible = true }.setBoolean(this, true)
-        } catch (_: Exception) {}
-
         super.onDraw(canvas)
 
-        // KEY POSITIONS in KeyboardView include padding offset:
-        // actual screen x = key.x + paddingLeft, actual screen y = key.y + paddingTop
         val pl = paddingLeft.toFloat()
         val pt = paddingTop.toFloat()
         val gap = 1.5f * dp
         val rad = 8f * dp
 
         keyboard?.keys?.forEach { key ->
-            if (!isSpecial(key.codes[0])) return@forEach
-
+            val code = key.codes[0]
             val l = key.x + pl + gap
             val t = key.y + pt + gap
             val r = key.x + pl + key.width - gap
             val b = key.y + pt + key.height - gap
 
-            val code = key.codes[0]
-            shadowPaint.color = specialShadow(code)
-            facePaint.color   = specialColor(code)
-            lblPaint.color    = specialTextColor(code)
-
-            // Shadow (1dp bawah)
-            canvas.drawRoundRect(RectF(l, t + dp, r, b + dp), rad, rad, shadowPaint)
-            // Colored face
-            canvas.drawRoundRect(RectF(l, t, r, b - dp), rad, rad, facePaint)
-
-            // Label
-            key.label?.let { lbl ->
-                val cy = (t + b - dp) / 2f - (lblPaint.descent() + lblPaint.ascent()) / 2f
-                canvas.drawText(lbl.toString(), (l + r) / 2f, cy, lblPaint)
-            }
-            key.icon?.let { icon ->
-                val iw = icon.intrinsicWidth; val ih = icon.intrinsicHeight
-                val cx = ((l + r) / 2f).toInt(); val cy2 = ((t + b - dp) / 2f).toInt()
-                icon.setBounds(cx - iw / 2, cy2 - ih / 2, cx + iw / 2, cy2 + ih / 2)
-                icon.colorFilter = PorterDuffColorFilter(lblPaint.color, PorterDuff.Mode.SRC_IN)
-                icon.draw(canvas)
+            if (isSpecial(code)) {
+                // Draw custom colored special key on top
+                shadowPaint.color = specialShadow(code)
+                facePaint.color   = specialColor(code)
+                lblPaint.color    = specialTextColor(code)
+                canvas.drawRoundRect(RectF(l, t + dp, r, b + dp), rad, rad, shadowPaint)
+                canvas.drawRoundRect(RectF(l, t, r, b - dp), rad, rad, facePaint)
+                key.label?.let { lbl ->
+                    val cy = (t + b - dp) / 2f - (lblPaint.descent() + lblPaint.ascent()) / 2f
+                    canvas.drawText(lbl.toString(), (l + r) / 2f, cy, lblPaint)
+                }
+                key.icon?.let { icon ->
+                    val iw = icon.intrinsicWidth; val ih = icon.intrinsicHeight
+                    val cx = ((l + r) / 2f).toInt(); val cy2 = ((t + b - dp) / 2f).toInt()
+                    icon.setBounds(cx - iw / 2, cy2 - ih / 2, cx + iw / 2, cy2 + ih / 2)
+                    icon.colorFilter = PorterDuffColorFilter(lblPaint.color, PorterDuff.Mode.SRC_IN)
+                    icon.draw(canvas)
+                }
+            } else if (!isDark) {
+                // Light theme: overdraw regular key label with dark color
+                // (super.onDraw drew white text on white key — invisible)
+                key.label?.let { lbl ->
+                    keyLblPaint.color = 0xFF1A1F2E.toInt()
+                    val cy = (t + b) / 2f - (keyLblPaint.descent() + keyLblPaint.ascent()) / 2f
+                    canvas.drawText(lbl.toString(), (l + r) / 2f, cy, keyLblPaint)
+                }
             }
         }
     }
