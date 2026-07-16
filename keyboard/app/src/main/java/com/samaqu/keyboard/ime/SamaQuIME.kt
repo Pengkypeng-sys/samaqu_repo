@@ -403,6 +403,17 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
             view.findViewById<android.widget.TextView?>(id)?.setTextColor(textClr)
         }
 
+        // Dev notice text color
+        listOf(R.id.pendingDevNotice, R.id.ongkirDevNotice).forEach { id ->
+            (view.findViewById<android.view.ViewGroup?>(id))?.let { vg ->
+                for (i in 0 until vg.childCount) {
+                    val child = vg.getChildAt(i)
+                    if (child is android.widget.TextView && child.textSize < 50f)
+                        child.setTextColor(labelClr)
+                }
+            }
+        }
+
         // Ongkir city suggestion lists
         listOf(R.id.oqOriginList, R.id.oqDestList).forEach { id ->
             view.findViewById<android.widget.ListView?>(id)?.setBackgroundColor(panelBg)
@@ -413,20 +424,16 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
     }
 
     private fun applyInvoiceLabelColors(view: View, labelClr: Int, textClr: Int, dark: Boolean) {
-        val labelIds = listOf(
-            R.id.invBuyer, R.id.invProduct, R.id.invQty, R.id.invPrice,
-            R.id.invOngkir, R.id.imbNo, R.id.imbHolder
-        )
-        // Traverse invoice panel to fix all small label TextViews
+        val excludeIds = setOf(R.id.btnCloseInvoice, R.id.invBtnGenerate, R.id.invoicePanelTitle)
         val invoicePanel = view.findViewById<android.view.ViewGroup?>(R.id.invoicePanel) ?: return
+        // label threshold: 10sp-11sp in px. Use 14sp * density as upper bound for labels
+        val labelMaxPx = 14 * resources.displayMetrics.scaledDensity
         fun traverse(vg: android.view.ViewGroup) {
             for (i in 0 until vg.childCount) {
                 when (val child = vg.getChildAt(i)) {
-                    is android.widget.EditText -> { /* handled above */ }
+                    is android.widget.EditText -> { /* handled in field loop above */ }
                     is android.widget.TextView -> {
-                        // Small labels (textSize ~10sp used for field labels)
-                        if (child.textSize <= 32f && child.id !in listOf(
-                                R.id.btnCloseInvoice, R.id.invBtnGenerate, R.id.invoicePanelTitle)) {
+                        if (child.id !in excludeIds && child.textSize <= labelMaxPx) {
                             child.setTextColor(labelClr)
                         }
                     }
@@ -803,8 +810,8 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
                 conn.connectTimeout = 4000; conn.readTimeout = 4000
                 val bmp = android.graphics.BitmapFactory.decodeStream(conn.inputStream)
                 conn.disconnect()
-                val dp48 = (48 * resources.displayMetrics.density).toInt()
-                val scaled = android.graphics.Bitmap.createScaledBitmap(bmp, dp48, dp48, true)
+                val dp28 = (28 * resources.displayMetrics.density).toInt()
+                val scaled = android.graphics.Bitmap.createScaledBitmap(bmp, dp28, dp28, true)
                 val d = android.graphics.drawable.BitmapDrawable(resources, scaled)
                 logoCache[domain] = d
                 d

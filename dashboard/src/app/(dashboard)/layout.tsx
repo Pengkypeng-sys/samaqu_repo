@@ -84,6 +84,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main */}
       <main className="flex-1 overflow-auto bg-gray-50">
+        <div className="bg-amber-50 border-b border-amber-200 px-6 py-2 flex items-center gap-2 text-amber-700 text-xs font-medium">
+          🚧 <span>Aplikasi masih dalam tahap pengembangan — fitur <strong>Pending</strong> dan <strong>Cek Ongkir</strong> belum aktif.</span>
+        </div>
         <div className="p-6">{children}</div>
       </main>
     </div>

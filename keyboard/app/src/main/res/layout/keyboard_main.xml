@@ -293,6 +293,19 @@
         </LinearLayout>
         <View android:id="@+id/pendingDivider" android:layout_width="match_parent" android:layout_height="1dp" android:background="#FF2D3548"/>
 
+        <!-- Dev notice — ganti dengan gone saat fitur aktif -->
+        <LinearLayout android:id="@+id/pendingDevNotice"
+            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+            android:orientation="vertical" android:gravity="center" android:padding="24dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="🚧" android:textSize="36sp" android:gravity="center"
+                android:layout_marginBottom="10dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Fitur Pending sedang\ndalam pengembangan"
+                android:textColor="#FF4B6080" android:textSize="13sp"
+                android:gravity="center" android:lineSpacingExtra="4dp"/>
+        </LinearLayout>
+
         <TextView android:id="@+id/pendingEmpty"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="Tidak ada order pending"
@@ -300,7 +313,8 @@
             android:gravity="center" android:padding="20dp" android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView android:id="@+id/pendingList"
-            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+            android:visibility="gone" />
     </LinearLayout>
 
     <!-- ══ PANEL EMOJI ══ -->
@@ -353,7 +367,22 @@
         </LinearLayout>
         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FF2D3548"/>
 
-        <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <!-- Dev notice ongkir -->
+        <LinearLayout android:id="@+id/ongkirDevNotice"
+            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+            android:orientation="vertical" android:gravity="center" android:padding="24dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="🚧" android:textSize="36sp" android:gravity="center"
+                android:layout_marginBottom="10dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Fitur Cek Ongkir sedang\ndalam pengembangan"
+                android:textColor="#FF4B6080" android:textSize="13sp"
+                android:gravity="center" android:lineSpacingExtra="4dp"/>
+        </LinearLayout>
+
+        <ScrollView android:id="@+id/ongkirScrollView"
+            android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+            android:visibility="gone">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="vertical" android:padding="10dp">
 
