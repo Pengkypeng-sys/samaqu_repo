@@ -36,4 +36,12 @@ class Prefs(ctx: Context) {
     var bankAccountsJson: String
         get() = sp.getString("bank_accounts", "[]") ?: "[]"
         set(v) = sp.edit { putString("bank_accounts", v) }
+
+    var storeName: String
+        get() = sp.getString("store_name", "SAMAQU") ?: "SAMAQU"
+        set(v) = sp.edit { putString("store_name", v) }
+
+    var invoiceFooter: String
+        get() = sp.getString("invoice_footer", "") ?: ""
+        set(v) = sp.edit { putString("invoice_footer", v) }
 }

@@ -33,5 +33,12 @@ class TemplateRepository(ctx: Context) {
             }
             prefs.bankAccountsJson = arr.toString()
         }
+        // Sync app config (biteship key, store name, invoice footer)
+        runCatching {
+            val cfg = RetrofitClient.api.getConfig()
+            cfg["biteship_key"]?.takeIf { it.isNotBlank() }?.let { prefs.biteshipKey = it }
+            cfg["store_name"]?.takeIf { it.isNotBlank() }?.let { prefs.storeName = it }
+            cfg["invoice_footer"]?.let { prefs.invoiceFooter = it }
+        }
     }
 }

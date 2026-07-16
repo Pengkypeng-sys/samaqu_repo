@@ -11,6 +11,7 @@ import { ShippingModule } from './shipping/shipping.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ReportsModule } from './reports/reports.module';
 import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
+import { AppConfigModule } from './config/app-config.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
     NotificationsModule,
     ReportsModule,
     BankAccountsModule,
+    AppConfigModule,
   ],
 })
 export class AppModule {}

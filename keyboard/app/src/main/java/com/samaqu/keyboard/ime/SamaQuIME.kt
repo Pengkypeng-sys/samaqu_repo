@@ -62,6 +62,7 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
     private var rootView: View? = null
     private var focusedField: EditText? = null
     private var selectedBank: String = ""
+    private val numericFields = mutableSetOf<EditText>()
 
     // Ongkir state
     private val uiHandler = Handler(Looper.getMainLooper())
@@ -191,12 +192,28 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
             view.findViewById<EditText>(R.id.imbNo),
             view.findViewById<EditText>(R.id.imbHolder)
         )
+        // Fields that should trigger numeric keyboard
+        numericFields.clear()
+        numericFields.addAll(listOf(
+            view.findViewById(R.id.invQty),
+            view.findViewById(R.id.invPrice),
+            view.findViewById(R.id.invOngkir),
+            view.findViewById(R.id.imbNo)
+        ))
         invoiceFields.forEach { field ->
             field.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     focusedField = field
                     invoiceFields.forEach { it.setBackgroundResource(R.drawable.field_bg) }
                     field.setBackgroundResource(R.drawable.field_bg_active)
+                    // Switch keyboard layout based on field type
+                    if (field in numericFields) {
+                        keyboardView?.keyboard = symbols
+                    } else {
+                        keyboardView?.keyboard = qwerty
+                        qwerty?.isShifted = caps
+                    }
+                    keyboardView?.invalidateAllKeys()
                 }
                 false
             }
@@ -218,8 +235,11 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
             val subtotal = price * qty
             val total    = subtotal + ongkir
             val sep = "─────────────────────"
+            val prefs = com.samaqu.keyboard.data.Prefs(this)
+            val storeName = prefs.storeName.ifBlank { "SAMAQU" }
+            val footer    = prefs.invoiceFooter
             val text = buildString {
-                appendLine("🧾 *INVOICE SAMAQU*")
+                appendLine("🧾 *INVOICE $storeName*")
                 appendLine(sep)
                 appendLine("Pembeli  : *$buyer*")
                 appendLine("Produk   : $product ($qty pcs)")
@@ -234,7 +254,11 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
                     appendLine(sep)
                     appendLine("💳 *Transfer via $selectedBank*")
                     if (bankNo.isNotBlank())   appendLine("No. Rek  : $bankNo")
-                    if (bankName.isNotBlank()) append("A/N      : $bankName")
+                    if (bankName.isNotBlank()) appendLine("A/N      : $bankName")
+                }
+                if (footer.isNotBlank()) {
+                    appendLine(sep)
+                    append(footer)
                 }
             }
             currentInputConnection?.commitText(text.trimEnd(), 1)
@@ -319,6 +343,10 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         emojiPanel?.visibility    = View.GONE
         keyboardView?.visibility  = View.VISIBLE
         focusedField = null
+        // Balik ke QWERTY saat panel ditutup
+        keyboardView?.keyboard = qwerty
+        qwerty?.isShifted = caps
+        keyboardView?.invalidateAllKeys()
     }
 
     private fun loadCached() {

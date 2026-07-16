@@ -46,6 +46,9 @@ interface ApiService {
     @GET("bank-accounts")
     suspend fun getBankAccounts(): List<BankAccountRemote>
 
+    @GET("config")
+    suspend fun getConfig(): Map<String, String>
+
     @GET("products")
     suspend fun getProducts(@Header("Authorization") auth: String): List<Product>
 
