@@ -144,12 +144,28 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         }
         view.findViewById<TextView>(R.id.btnClosePending).setOnClickListener { hideAllPanels() }
 
-        // Shipping spinner
+        // Shipping spinner — custom adapter dengan icon kurir
         val shippingOptions = listOf("Gojek Instant", "J&T Express", "Lalamove", "SiCepat", "JNE", "Anteraja", "Shopee Express")
-        view.findViewById<Spinner>(R.id.invShipping).adapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_item, shippingOptions).also {
-                it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val courierColors = listOf(0xFF00AA13L, 0xFFD51222L, 0xFFFF6B00L, 0xFFEA0029L, 0xFF003087L, 0xFF0B5CABL, 0xFFEE4D2DL)
+        view.findViewById<Spinner>(R.id.invShipping).adapter = object : ArrayAdapter<String>(
+            this, android.R.layout.simple_spinner_item, shippingOptions) {
+            override fun getView(pos: Int, cv: android.view.View?, parent: android.view.ViewGroup): android.view.View {
+                val tv = super.getView(pos, cv, parent) as android.widget.TextView
+                val icon = getDrawable(R.drawable.ic_courier)?.mutate()
+                icon?.setTint(courierColors.getOrElse(pos) { 0xFF1D4ED8L }.toInt())
+                tv.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+                tv.compoundDrawablePadding = 8
+                return tv
             }
+            override fun getDropDownView(pos: Int, cv: android.view.View?, parent: android.view.ViewGroup): android.view.View {
+                val tv = super.getDropDownView(pos, cv, parent) as android.widget.TextView
+                val icon = getDrawable(R.drawable.ic_courier)?.mutate()
+                icon?.setTint(courierColors.getOrElse(pos) { 0xFF1D4ED8L }.toInt())
+                tv.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+                tv.compoundDrawablePadding = 8
+                return tv
+            }
+        }.also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
 
         // Auto Text panel
         val adp = TemplateAdapter { text ->
@@ -283,12 +299,32 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
     }
 
     private fun applyThemePanels(view: View, dark: Boolean) {
-        val bg      = if (dark) 0xFF1A1F2E.toInt() else 0xFFF4F6FA.toInt()
-        val panelBg = if (dark) 0xFF1E2536.toInt() else 0xFFFFFFFF.toInt()
-        val textClr = if (dark) 0xFFEEEEEE.toInt() else 0xFF1A1F2E.toInt()
-        val fieldBg = if (dark) R.drawable.field_bg else R.drawable.field_bg_light
+        val bg        = if (dark) 0xFF1A1F2E.toInt() else 0xFFF0F4FF.toInt()
+        val panelBg   = if (dark) 0xFF1E2536.toInt() else 0xFFFFFFFF.toInt()
+        val textClr   = if (dark) 0xFFEEEEEE.toInt() else 0xFF2D3748.toInt()
+        val fieldBg   = if (dark) R.drawable.field_bg else R.drawable.field_bg_light
+        val toolbarBg = if (dark) 0xFF1D4ED8.toInt() else 0xFFDEEBFF.toInt()
+        val tbIconClr = if (dark) 0xCCFFFFFF.toInt() else 0xFF1D4ED8.toInt()
+        val tabBg     = if (dark) 0xFF1A2540.toInt() else 0xFFCFDFFF.toInt()
 
         view.setBackgroundColor(bg)
+
+        // Toolbar
+        view.findViewById<android.view.View?>(R.id.keyboardToolbar)?.setBackgroundColor(toolbarBg)
+        // Update toolbar icon text colors
+        view.findViewById<android.view.ViewGroup?>(R.id.keyboardToolbar)?.let { toolbar ->
+            for (i in 0 until toolbar.childCount) {
+                val child = toolbar.getChildAt(i)
+                if (child is android.view.ViewGroup) {
+                    for (j in 0 until child.childCount) {
+                        val v = child.getChildAt(j)
+                        if (v is android.widget.TextView) v.setTextColor(tbIconClr)
+                        if (v is android.widget.ImageView) v.setColorFilter(tbIconClr)
+                    }
+                }
+                if (child is android.widget.TextView) child.setTextColor(tbIconClr)
+            }
+        }
 
         listOf(R.id.templatePanel, R.id.invoicePanel, R.id.webPanel,
                R.id.pendingPanel, R.id.emojiPanel).forEach { id ->
@@ -298,16 +334,16 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
 
         // Category tabs strip
         (view.findViewById<android.view.View?>(R.id.categoryTabs)?.parent as? android.view.View)
-            ?.setBackgroundColor(if (dark) 0xFF1A2540.toInt() else 0xFFE0E5F0.toInt())
+            ?.setBackgroundColor(tabBg)
 
-        // Invoice & ongkir input fields — fix background AND text color so not camouflaged
+        // Input fields — background + text color + hint
         listOf(R.id.invBuyer, R.id.invProduct, R.id.invQty, R.id.invPrice,
                R.id.invOngkir, R.id.imbNo, R.id.imbHolder,
                R.id.oqOrigin, R.id.oqDest, R.id.oqWeight).forEach { id ->
             view.findViewById<android.widget.EditText?>(id)?.let { et ->
                 et.setBackgroundResource(fieldBg)
                 et.setTextColor(textClr)
-                et.setHintTextColor(if (dark) 0xFF666888.toInt() else 0xFF9999AA.toInt())
+                et.setHintTextColor(if (dark) 0xFF666888.toInt() else 0xFF8899BB.toInt())
             }
         }
         view.findViewById<android.widget.TextView?>(R.id.pendingEmpty)?.setTextColor(textClr)

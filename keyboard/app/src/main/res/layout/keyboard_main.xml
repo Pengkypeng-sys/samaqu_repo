@@ -7,6 +7,7 @@
 
     <!-- ══ TOOLBAR ══ -->
     <LinearLayout
+        android:id="@+id/keyboardToolbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
         android:orientation="horizontal"
@@ -200,45 +201,52 @@
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="horizontal" android:layout_marginBottom="4dp">
-                    <TextView android:id="@+id/imbBca" android:layout_width="0dp" android:layout_height="32dp"
+                    <TextView android:id="@+id/imbBca" android:layout_width="0dp" android:layout_height="48dp"
                         android:layout_weight="1" android:text="BCA" android:gravity="center"
-                        android:textSize="11sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:textSize="9sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:drawableTop="@drawable/ic_bank" android:drawablePadding="2dp"
                         android:background="@drawable/btn_bank_bca" android:layout_marginEnd="3dp"
                         android:clickable="true" android:focusable="true"/>
-                    <TextView android:id="@+id/imbBri" android:layout_width="0dp" android:layout_height="32dp"
+                    <TextView android:id="@+id/imbBri" android:layout_width="0dp" android:layout_height="48dp"
                         android:layout_weight="1" android:text="BRI" android:gravity="center"
-                        android:textSize="11sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:textSize="9sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:drawableTop="@drawable/ic_bank" android:drawablePadding="2dp"
                         android:background="@drawable/btn_bank_bri" android:layout_marginEnd="3dp"
                         android:clickable="true" android:focusable="true"/>
-                    <TextView android:id="@+id/imbBni" android:layout_width="0dp" android:layout_height="32dp"
+                    <TextView android:id="@+id/imbBni" android:layout_width="0dp" android:layout_height="48dp"
                         android:layout_weight="1" android:text="BNI" android:gravity="center"
-                        android:textSize="11sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:textSize="9sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:drawableTop="@drawable/ic_bank" android:drawablePadding="2dp"
                         android:background="@drawable/btn_bank_bni" android:layout_marginEnd="3dp"
                         android:clickable="true" android:focusable="true"/>
-                    <TextView android:id="@+id/imbMandiri" android:layout_width="0dp" android:layout_height="32dp"
-                        android:layout_weight="1" android:text="MND" android:gravity="center"
-                        android:textSize="11sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                    <TextView android:id="@+id/imbMandiri" android:layout_width="0dp" android:layout_height="48dp"
+                        android:layout_weight="1" android:text="Mandiri" android:gravity="center"
+                        android:textSize="9sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:drawableTop="@drawable/ic_bank" android:drawablePadding="2dp"
                         android:background="@drawable/btn_bank_mandiri"
                         android:clickable="true" android:focusable="true"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="horizontal" android:layout_marginBottom="8dp">
-                    <TextView android:id="@+id/imbBsi" android:layout_width="0dp" android:layout_height="32dp"
+                    <TextView android:id="@+id/imbBsi" android:layout_width="0dp" android:layout_height="48dp"
                         android:layout_weight="1" android:text="BSI" android:gravity="center"
-                        android:textSize="11sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:textSize="9sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:drawableTop="@drawable/ic_bank" android:drawablePadding="2dp"
                         android:background="@drawable/btn_bank_bsi" android:layout_marginEnd="3dp"
                         android:clickable="true" android:focusable="true"/>
-                    <TextView android:id="@+id/imbDana" android:layout_width="0dp" android:layout_height="32dp"
+                    <TextView android:id="@+id/imbDana" android:layout_width="0dp" android:layout_height="48dp"
                         android:layout_weight="1" android:text="DANA" android:gravity="center"
-                        android:textSize="11sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:textSize="9sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:drawableTop="@drawable/ic_bank" android:drawablePadding="2dp"
                         android:background="@drawable/btn_bank_dana" android:layout_marginEnd="3dp"
                         android:clickable="true" android:focusable="true"/>
-                    <TextView android:id="@+id/imbOvo" android:layout_width="0dp" android:layout_height="32dp"
+                    <TextView android:id="@+id/imbOvo" android:layout_width="0dp" android:layout_height="48dp"
                         android:layout_weight="1" android:text="OVO" android:gravity="center"
-                        android:textSize="11sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:textSize="9sp" android:textColor="#FFFFFFFF" android:textStyle="bold"
+                        android:drawableTop="@drawable/ic_bank" android:drawablePadding="2dp"
                         android:background="@drawable/btn_bank_ovo" android:layout_marginEnd="3dp"
                         android:clickable="true" android:focusable="true"/>
-                    <View android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1"/>
+                    <View android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1"/>
                 </LinearLayout>
 
                 <!-- Bank no (muncul setelah pilih bank) -->
@@ -420,9 +428,9 @@
         android:shadowColor="#661D4ED8"
         android:shadowRadius="0"
         android:background="#FF1A1F2E"
-        android:paddingTop="6dp"
-        android:paddingBottom="8dp"
-        android:paddingStart="3dp"
-        android:paddingEnd="3dp" />
+        android:paddingTop="4dp"
+        android:paddingBottom="6dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp" />
 
 </LinearLayout>
