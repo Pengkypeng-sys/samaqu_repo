@@ -60,4 +60,8 @@ class Prefs(ctx: Context) {
     var invoiceShowSubtotal: Boolean
         get() = sp.getString("invoice_show_subtotal", "1") != "0"
         set(v) = sp.edit { putString("invoice_show_subtotal", if (v) "1" else "0") }
+
+    var darkTheme: Boolean
+        get() = sp.getBoolean("dark_theme", true)
+        set(v) = sp.edit { putBoolean("dark_theme", v) }
 }

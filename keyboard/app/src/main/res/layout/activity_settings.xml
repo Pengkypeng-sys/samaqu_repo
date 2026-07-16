@@ -154,6 +154,17 @@
             android:textColor="#FF1E293B" />
     </RadioGroup>
 
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFE2E8F0" android:layout_marginBottom="16dp" />
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="🌙  Tema Gelap Keyboard" android:textSize="14sp" android:textColor="#FF1E293B"/>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchDarkTheme"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    </LinearLayout>
+
     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFE2E8F0" android:layout_marginBottom="24dp" />
 
     <com.google.android.material.button.MaterialButton

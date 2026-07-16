@@ -10,7 +10,7 @@
     android:paddingBottom="11dp"
     android:clickable="true"
     android:focusable="true"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="#FF252B3D">
 
     <View
         android:layout_width="3dp"
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="13sp"
-        android:textColor="#FF222222"
+        android:textColor="#FFEEEEEE"
         android:maxLines="2"
         android:ellipsize="end" />
 
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:text="›"
         android:textSize="20sp"
-        android:textColor="#FFAAAAAA"
+        android:textColor="#FF8899BB"
         android:layout_marginStart="8dp" />
 
 </LinearLayout>

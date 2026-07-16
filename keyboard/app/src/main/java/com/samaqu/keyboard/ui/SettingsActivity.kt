@@ -6,6 +6,8 @@ import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.snackbar.Snackbar
 import com.samaqu.keyboard.R
 import com.samaqu.keyboard.data.Prefs
@@ -19,6 +21,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -50,6 +53,13 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.btnDashboard.setOnClickListener {
             startActivity(Intent(this, DashboardActivity::class.java))
+        }
+
+        val switchDark = binding.root.findViewById<SwitchCompat>(R.id.switchDarkTheme)
+        switchDark.isChecked = prefs.darkTheme
+        switchDark.setOnCheckedChangeListener { _, checked ->
+            prefs.darkTheme = checked
+            Snackbar.make(binding.root, "Restart keyboard untuk apply tema", Snackbar.LENGTH_SHORT).show()
         }
     }
 }

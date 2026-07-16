@@ -1,8 +1,7 @@
 package com.samaqu.keyboard.network
 
 import com.google.gson.annotations.SerializedName
-import retrofit2.http.GET
-import retrofit2.http.Header
+import retrofit2.http.*
 
 data class CategoryWithTemplates(
     val id: Int,
@@ -58,4 +57,14 @@ interface ApiService {
     @GET("orders")
     suspend fun getOrders(@Header("Authorization") auth: String): List<OrderItem>
 
+    @POST("templates/categories")
+    suspend fun createCategory(@Header("Authorization") auth: String, @Body body: Map<String, String>): CachedCategoryRemote
+
+    @POST("templates")
+    suspend fun createTemplate(@Header("Authorization") auth: String, @Body body: Map<String, @JvmSuppressWildcards Any>): RemoteTemplate
+
+    @DELETE("templates/{id}")
+    suspend fun deleteTemplate(@Header("Authorization") auth: String, @Path("id") id: Int)
 }
+
+data class CachedCategoryRemote(val id: Int, val name: String)

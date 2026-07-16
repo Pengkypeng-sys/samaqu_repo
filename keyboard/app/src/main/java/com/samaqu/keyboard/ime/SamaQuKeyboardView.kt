@@ -13,6 +13,29 @@ class SamaQuKeyboardView @JvmOverloads constructor(
     private val dp = ctx.resources.displayMetrics.density
     private val sp = ctx.resources.displayMetrics.scaledDensity
 
+    var isDark = true
+
+    fun applyTheme(dark: Boolean) {
+        isDark = dark
+        setBackgroundColor(if (dark) 0xFF1A1F2E.toInt() else 0xFFD1D5DB.toInt())
+        // Swap key background drawable
+        val bgRes = if (dark) com.samaqu.keyboard.R.drawable.key_bg else com.samaqu.keyboard.R.drawable.key_bg_light
+        val bgDrawable = context.getDrawable(bgRes)
+        try {
+            KeyboardView::class.java.getDeclaredField("mKeyBackground")
+                .also { it.isAccessible = true }.set(this, bgDrawable)
+        } catch (_: Exception) {}
+        // Change text color for regular keys
+        try {
+            val f = KeyboardView::class.java.getDeclaredField("mPaint")
+            f.isAccessible = true
+            (f.get(this) as? Paint)?.color = if (dark) 0xFFFFFFFF.toInt() else 0xFF1A1F2E.toInt()
+            KeyboardView::class.java.getDeclaredField("mDrawPending")
+                .also { it.isAccessible = true }.setBoolean(this, true)
+        } catch (_: Exception) {}
+        invalidateAllKeys()
+    }
+
     // iOS special key: gray face
     private val facePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFADB5BD.toInt() }
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF868E96.toInt() }
@@ -46,24 +69,37 @@ class SamaQuKeyboardView @JvmOverloads constructor(
 
     private fun specialColor(code: Int): Int {
         val shifted = keyboard?.isShifted == true
-        return when (code) {
+        return if (isDark) when (code) {
             Keyboard.KEYCODE_SHIFT  -> if (shifted) 0xFF1D4ED8.toInt() else 0xFFADB5BD.toInt()
-            Keyboard.KEYCODE_DELETE -> 0xFFCB3234.toInt() // merah
-            Keyboard.KEYCODE_DONE   -> 0xFF1D4ED8.toInt() // biru
-            -100, -101              -> 0xFF868E96.toInt() // abu gelap
-            -200                    -> 0xFFFFD700.toInt() // kuning (emoji)
+            Keyboard.KEYCODE_DELETE -> 0xFFCB3234.toInt()
+            Keyboard.KEYCODE_DONE   -> 0xFF1D4ED8.toInt()
+            -100, -101              -> 0xFF868E96.toInt()
+            -200                    -> 0xFFFFD700.toInt()
             else                    -> 0xFFADB5BD.toInt()
+        } else when (code) {
+            Keyboard.KEYCODE_SHIFT  -> if (shifted) 0xFF1D4ED8.toInt() else 0xFFB0B8C8.toInt()
+            Keyboard.KEYCODE_DELETE -> 0xFFCB3234.toInt()
+            Keyboard.KEYCODE_DONE   -> 0xFF1D4ED8.toInt()
+            -100, -101              -> 0xFFB0B8C8.toInt()
+            -200                    -> 0xFFFFD700.toInt()
+            else                    -> 0xFFB0B8C8.toInt()
         }
     }
 
     private fun specialShadow(code: Int): Int {
         val shifted = keyboard?.isShifted == true
-        return when (code) {
+        return if (isDark) when (code) {
             Keyboard.KEYCODE_SHIFT  -> if (shifted) 0xFF1558A0.toInt() else 0xFF868E96.toInt()
             Keyboard.KEYCODE_DELETE -> 0xFF8B1A1A.toInt()
             Keyboard.KEYCODE_DONE   -> 0xFF1558A0.toInt()
             -200                    -> 0xFFB8960A.toInt()
             else                    -> 0xFF5A6169.toInt()
+        } else when (code) {
+            Keyboard.KEYCODE_SHIFT  -> if (shifted) 0xFF1558A0.toInt() else 0xFF8898B0.toInt()
+            Keyboard.KEYCODE_DELETE -> 0xFF8B1A1A.toInt()
+            Keyboard.KEYCODE_DONE   -> 0xFF1558A0.toInt()
+            -200                    -> 0xFFB8960A.toInt()
+            else                    -> 0xFF8898B0.toInt()
         }
     }
 

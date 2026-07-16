@@ -96,10 +96,10 @@
     <!-- ══ PANEL AUTO TEXT ══ -->
     <LinearLayout android:id="@+id/templatePanel"
         android:layout_width="match_parent" android:layout_height="@dimen/panel_height"
-        android:orientation="vertical" android:background="#FFFFFFFF" android:visibility="gone">
+        android:orientation="vertical" android:background="#FF1E2536" android:visibility="gone">
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="38dp"
-            android:background="#FFF5F5F5" android:gravity="center_vertical"
+            android:background="#FF252D3E" android:gravity="center_vertical"
             android:paddingStart="12dp" android:paddingEnd="6dp" android:orientation="horizontal">
             <HorizontalScrollView android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:scrollbars="none">
                 <LinearLayout android:id="@+id/categoryTabs" android:layout_width="wrap_content" android:layout_height="match_parent"
@@ -109,20 +109,20 @@
                 android:text="✕" android:textSize="14sp" android:textColor="#FF999999"
                 android:gravity="center" android:clickable="true" android:focusable="true" />
         </LinearLayout>
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFEEEEEE"/>
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FF2D3548"/>
 
         <androidx.recyclerview.widget.RecyclerView android:id="@+id/templateList"
             android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:background="#FFFFFFFF" />
+            android:background="#FF1E2536" />
     </LinearLayout>
 
     <!-- ══ PANEL INVOICE ══ -->
     <LinearLayout android:id="@+id/invoicePanel"
         android:layout_width="match_parent" android:layout_height="@dimen/invoice_panel_height"
-        android:orientation="vertical" android:background="#FFFFFFFF" android:visibility="gone">
+        android:orientation="vertical" android:background="#FF1E2536" android:visibility="gone">
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="40dp"
-            android:background="#FFF0F4FF" android:gravity="center_vertical"
+            android:background="#FF1D2D4A" android:gravity="center_vertical"
             android:paddingStart="14dp" android:paddingEnd="6dp" android:orientation="horizontal">
             <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_tb_invoice" android:layout_marginEnd="8dp"/>
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
@@ -131,7 +131,7 @@
                 android:text="✕" android:textSize="14sp" android:textColor="#FF999999"
                 android:gravity="center" android:clickable="true" android:focusable="true" />
         </LinearLayout>
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFEEEEEE"/>
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FF2D3548"/>
 
         <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -139,51 +139,51 @@
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingEnd="4dp">
-                        <TextView android:text="Pembeli" android:textColor="#FF666666" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
+                        <TextView android:text="Pembeli" android:textColor="#FFAAAACC" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
                         <EditText android:id="@+id/invBuyer" android:layout_width="match_parent" android:layout_height="38dp"
                             android:background="@drawable/field_bg_light" android:paddingStart="10dp" android:paddingEnd="10dp"
-                            android:textColor="#FF111111" android:textColorHint="#FFAAAAAA" android:textSize="12sp" android:hint="Nama pembeli" />
+                            android:textColor="#FFEEEEEE" android:textColorHint="#FF666888" android:textSize="12sp" android:hint="Nama pembeli" />
                     </LinearLayout>
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="4dp">
-                        <TextView android:text="Produk" android:textColor="#FF666666" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
+                        <TextView android:text="Produk" android:textColor="#FFAAAACC" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
                         <EditText android:id="@+id/invProduct" android:layout_width="match_parent" android:layout_height="38dp"
                             android:background="@drawable/field_bg_light" android:paddingStart="10dp" android:paddingEnd="10dp"
-                            android:textColor="#FF111111" android:textColorHint="#FFAAAAAA" android:textSize="12sp" android:hint="Nama produk" />
+                            android:textColor="#FFEEEEEE" android:textColorHint="#FF666888" android:textSize="12sp" android:hint="Nama produk" />
                     </LinearLayout>
                 </LinearLayout>
 
                 <!-- Qty + Harga -->
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingEnd="4dp">
-                        <TextView android:text="Qty" android:textColor="#FF666666" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
+                        <TextView android:text="Qty" android:textColor="#FFAAAACC" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
                         <EditText android:id="@+id/invQty" android:layout_width="match_parent" android:layout_height="38dp"
                             android:background="@drawable/field_bg_light" android:paddingStart="10dp" android:paddingEnd="10dp"
-                            android:textColor="#FF111111" android:textColorHint="#FFAAAAAA" android:textSize="12sp" android:hint="1" android:inputType="number" />
+                            android:textColor="#FFEEEEEE" android:textColorHint="#FF666888" android:textSize="12sp" android:hint="1" android:inputType="number" />
                     </LinearLayout>
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="4dp">
-                        <TextView android:text="Harga (Rp)" android:textColor="#FF666666" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
+                        <TextView android:text="Harga (Rp)" android:textColor="#FFAAAACC" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
                         <EditText android:id="@+id/invPrice" android:layout_width="match_parent" android:layout_height="38dp"
                             android:background="@drawable/field_bg_light" android:paddingStart="10dp" android:paddingEnd="10dp"
-                            android:textColor="#FF111111" android:textColorHint="#FFAAAAAA" android:textSize="12sp" android:hint="0" android:inputType="text" android:digits="0123456789." />
+                            android:textColor="#FFEEEEEE" android:textColorHint="#FF666888" android:textSize="12sp" android:hint="0" android:inputType="text" android:digits="0123456789." />
                     </LinearLayout>
                 </LinearLayout>
 
                 <!-- Jasa Kirim + Ongkir -->
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingEnd="4dp">
-                        <TextView android:text="Jasa Kirim" android:textColor="#FF666666" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
+                        <TextView android:text="Jasa Kirim" android:textColor="#FFAAAACC" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
                         <Spinner android:id="@+id/invShipping"
                             android:layout_width="match_parent" android:layout_height="38dp"
                             android:background="@drawable/field_bg_light"
                             android:paddingStart="10dp" android:paddingEnd="6dp"
-                            android:textColor="#FF111111" android:textSize="12sp"
+                            android:textColor="#FFEEEEEE" android:textSize="12sp"
                             android:gravity="center_vertical"/>
                     </LinearLayout>
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="4dp">
-                        <TextView android:text="Ongkir (Rp)" android:textColor="#FF666666" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
+                        <TextView android:text="Ongkir (Rp)" android:textColor="#FFAAAACC" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="3dp"/>
                         <EditText android:id="@+id/invOngkir" android:layout_width="match_parent" android:layout_height="38dp"
                             android:background="@drawable/field_bg_light" android:paddingStart="10dp" android:paddingEnd="10dp"
-                            android:textColor="#FF111111" android:textColorHint="#FFAAAAAA" android:textSize="12sp" android:hint="0" android:inputType="text" android:digits="0123456789." />
+                            android:textColor="#FFEEEEEE" android:textColorHint="#FF666888" android:textSize="12sp" android:hint="0" android:inputType="text" android:digits="0123456789." />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -194,7 +194,7 @@
                     <TextView android:layout_width="18dp" android:layout_height="12dp"
                         android:background="#FFDDAA00" android:layout_marginEnd="6dp"/>
                     <TextView android:text="Transfer via (opsional)" android:textSize="10sp"
-                        android:textColor="#FF666666"
+                        android:textColor="#FFAAAACC"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
 
@@ -247,11 +247,11 @@
                     android:visibility="gone" android:layout_marginBottom="8dp">
                     <EditText android:id="@+id/imbNo" android:layout_width="match_parent" android:layout_height="38dp"
                         android:background="@drawable/field_bg_light" android:paddingStart="10dp" android:paddingEnd="10dp"
-                        android:textColor="#FF111111" android:textColorHint="#FFAAAAAA" android:textSize="12sp"
+                        android:textColor="#FFEEEEEE" android:textColorHint="#FF666888" android:textSize="12sp"
                         android:hint="Nomor rekening" android:inputType="number" android:layout_marginBottom="6dp"/>
                     <EditText android:id="@+id/imbHolder" android:layout_width="match_parent" android:layout_height="38dp"
                         android:background="@drawable/field_bg_light" android:paddingStart="10dp" android:paddingEnd="10dp"
-                        android:textColor="#FF111111" android:textColorHint="#FFAAAAAA" android:textSize="12sp"
+                        android:textColor="#FFEEEEEE" android:textColorHint="#FF666888" android:textSize="12sp"
                         android:hint="Nama pemilik rekening"/>
                 </LinearLayout>
 
@@ -268,10 +268,10 @@
     <!-- ══ PANEL PENDING ══ -->
     <LinearLayout android:id="@+id/pendingPanel"
         android:layout_width="match_parent" android:layout_height="@dimen/panel_height"
-        android:orientation="vertical" android:background="#FFFFFFFF" android:visibility="gone">
+        android:orientation="vertical" android:background="#FF1E2536" android:visibility="gone">
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="40dp"
-            android:background="#FFF0F4FF" android:gravity="center_vertical"
+            android:background="#FF1D2D4A" android:gravity="center_vertical"
             android:paddingStart="12dp" android:paddingEnd="6dp" android:orientation="horizontal">
             <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_tb_pending" android:layout_marginEnd="8dp"/>
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
@@ -280,7 +280,7 @@
                 android:text="✕" android:textSize="14sp" android:textColor="#FF999999"
                 android:gravity="center" android:clickable="true" android:focusable="true" />
         </LinearLayout>
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFEEEEEE"/>
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FF2D3548"/>
 
         <TextView android:id="@+id/pendingEmpty"
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -290,17 +290,17 @@
 
         <androidx.recyclerview.widget.RecyclerView android:id="@+id/pendingList"
             android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-            android:background="#FFFFFFFF" />
+            android:background="#FF1E2536" />
     </LinearLayout>
 
     <!-- ══ PANEL EMOJI ══ -->
     <LinearLayout android:id="@+id/emojiPanel"
         android:layout_width="match_parent" android:layout_height="@dimen/panel_height"
-        android:orientation="vertical" android:background="#FFFFFFFF" android:visibility="gone">
+        android:orientation="vertical" android:background="#FF1E2536" android:visibility="gone">
 
         <!-- Header -->
         <LinearLayout android:layout_width="match_parent" android:layout_height="36dp"
-            android:background="#FFF5F5F5" android:gravity="center_vertical"
+            android:background="#FF252D3E" android:gravity="center_vertical"
             android:paddingStart="14dp" android:paddingEnd="6dp" android:orientation="horizontal">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="Emoji" android:textColor="#FF1D4ED8" android:textSize="12sp" android:textStyle="bold"/>
@@ -311,14 +311,14 @@
 
         <!-- Tabs kategori -->
         <HorizontalScrollView android:layout_width="match_parent" android:layout_height="34dp"
-            android:background="#FFFFFFFF" android:scrollbars="none">
+            android:background="#FF1E2536" android:scrollbars="none">
             <LinearLayout android:id="@+id/emojiCategoryTabs"
                 android:layout_width="wrap_content" android:layout_height="match_parent"
                 android:orientation="horizontal" android:gravity="center_vertical"
                 android:paddingStart="6dp" android:paddingEnd="6dp"/>
         </HorizontalScrollView>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFEEEEEE"/>
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FF2D3548"/>
 
         <androidx.recyclerview.widget.RecyclerView android:id="@+id/emojiList"
             android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
@@ -328,10 +328,10 @@
     <!-- ══ PANEL WEBVIEW ══ -->
     <LinearLayout android:id="@+id/webPanel"
         android:layout_width="match_parent" android:layout_height="@dimen/web_panel_height"
-        android:orientation="vertical" android:background="#FFFFFFFF" android:visibility="gone">
+        android:orientation="vertical" android:background="#FF1E2536" android:visibility="gone">
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="40dp"
-            android:background="#FFF0F4FF" android:gravity="center_vertical"
+            android:background="#FF1D2D4A" android:gravity="center_vertical"
             android:paddingStart="14dp" android:paddingEnd="6dp" android:orientation="horizontal">
             <TextView android:id="@+id/webPanelTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="Cek Ongkir" android:textColor="#FF1D4ED8" android:textSize="13sp" android:textStyle="bold" />
@@ -339,7 +339,7 @@
                 android:text="✕" android:textSize="14sp" android:textColor="#FF999999"
                 android:gravity="center" android:clickable="true" android:focusable="true" />
         </LinearLayout>
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFEEEEEE"/>
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FF2D3548"/>
 
         <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -353,12 +353,12 @@
                     android:text="Asal" android:textColor="#FF6B7280" android:textSize="11sp" android:paddingStart="10dp"/>
                 <EditText android:id="@+id/oqOrigin" android:layout_width="0dp" android:layout_height="match_parent"
                     android:layout_weight="1" android:background="@null" android:paddingEnd="8dp"
-                    android:textColor="#FF111111" android:textColorHint="#FFBBBBBB" android:textSize="12sp"
+                    android:textColor="#FFEEEEEE" android:textColorHint="#FFBBBBBB" android:textSize="12sp"
                     android:hint="Cari kota asal..." android:singleLine="true" android:imeOptions="actionNext"
                     android:inputType="text"/>
             </LinearLayout>
             <ListView android:id="@+id/oqOriginList" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:background="#FFFAFAFA"
+                android:layout_height="wrap_content" android:background="#FF1E2536"
                 android:visibility="gone" android:divider="#FFE2E8F0" android:dividerHeight="1dp"
                 android:layout_marginBottom="4dp"/>
 
@@ -370,12 +370,12 @@
                     android:text="Tujuan" android:textColor="#FF6B7280" android:textSize="11sp" android:paddingStart="10dp"/>
                 <EditText android:id="@+id/oqDest" android:layout_width="0dp" android:layout_height="match_parent"
                     android:layout_weight="1" android:background="@null" android:paddingEnd="8dp"
-                    android:textColor="#FF111111" android:textColorHint="#FFBBBBBB" android:textSize="12sp"
+                    android:textColor="#FFEEEEEE" android:textColorHint="#FFBBBBBB" android:textSize="12sp"
                     android:hint="Cari kota tujuan..." android:singleLine="true" android:imeOptions="actionNext"
                     android:inputType="text"/>
             </LinearLayout>
             <ListView android:id="@+id/oqDestList" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:background="#FFFAFAFA"
+                android:layout_height="wrap_content" android:background="#FF1E2536"
                 android:visibility="gone" android:divider="#FFE2E8F0" android:dividerHeight="1dp"
                 android:layout_marginBottom="4dp"/>
 
@@ -390,7 +390,7 @@
                         android:text="Berat(g)" android:textColor="#FF6B7280" android:textSize="10sp" android:paddingStart="8dp"/>
                     <EditText android:id="@+id/oqWeight" android:layout_width="0dp" android:layout_height="match_parent"
                         android:layout_weight="1" android:background="@null" android:paddingEnd="8dp"
-                        android:textColor="#FF111111" android:textSize="12sp" android:hint="1000"
+                        android:textColor="#FFEEEEEE" android:textSize="12sp" android:hint="1000"
                         android:textColorHint="#FFBBBBBB" android:inputType="number" android:singleLine="true"/>
                 </LinearLayout>
                 <TextView android:id="@+id/btnOqCek" android:layout_width="80dp" android:layout_height="36dp"

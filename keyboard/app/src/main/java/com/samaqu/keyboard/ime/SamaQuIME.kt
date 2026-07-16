@@ -82,7 +82,11 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         val view = layoutInflater.inflate(R.layout.keyboard_main, null)
         rootView = view
 
-        val large = com.samaqu.keyboard.data.Prefs(this).keySize == "large"
+        val prefs0 = com.samaqu.keyboard.data.Prefs(this)
+        val large = prefs0.keySize == "large"
+        val dark  = prefs0.darkTheme
+        view.setBackgroundColor(if (dark) 0xFF1A1F2E.toInt() else 0xFFE8ECF0.toInt())
+
         qwerty  = Keyboard(this, if (large) R.xml.qwerty_large  else R.xml.qwerty)
         symbols = Keyboard(this, if (large) R.xml.symbols_large else R.xml.symbols)
 
@@ -90,6 +94,7 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
             it.keyboard = qwerty
             it.setOnKeyboardActionListener(this)
             it.isPreviewEnabled = false
+            it.applyTheme(dark)
         }
 
         templatePanel = view.findViewById(R.id.templatePanel)
