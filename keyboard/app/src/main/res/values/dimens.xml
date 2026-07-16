@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Phone dimensions -->
+<resources>
+    <dimen name="key_height">44dp</dimen>
+    <dimen name="key_height_large">54dp</dimen>
+    <dimen name="toolbar_height">46dp</dimen>
+    <dimen name="panel_height">210dp</dimen>
+    <dimen name="invoice_panel_height">320dp</dimen>
+    <dimen name="web_panel_height">310dp</dimen>
+    <dimen name="key_text_size">15sp</dimen>
+</resources>

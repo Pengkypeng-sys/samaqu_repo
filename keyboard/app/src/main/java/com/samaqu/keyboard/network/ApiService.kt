@@ -15,6 +15,21 @@ data class RemoteTemplate(
     val content: String
 )
 
+data class OrderItem(
+    val id: Int,
+    val status: String,
+    @SerializedName("buyer_name") val buyerName: String?,
+    @SerializedName("created_at") val createdAt: String?
+)
+
+data class BankAccountRemote(
+    val id: Int,
+    @SerializedName("bank_name") val bankName: String,
+    @SerializedName("account_number") val accountNumber: String,
+    @SerializedName("account_holder") val accountHolder: String,
+    @SerializedName("is_active") val isActive: Boolean
+)
+
 data class Product(
     val id: Int,
     val name: String,
@@ -28,6 +43,13 @@ interface ApiService {
     @GET("templates")
     suspend fun getTemplates(): List<CategoryWithTemplates>
 
+    @GET("bank-accounts")
+    suspend fun getBankAccounts(): List<BankAccountRemote>
+
     @GET("products")
     suspend fun getProducts(@Header("Authorization") auth: String): List<Product>
+
+    @GET("orders")
+    suspend fun getOrders(@Header("Authorization") auth: String): List<OrderItem>
+
 }

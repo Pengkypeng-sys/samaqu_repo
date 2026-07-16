@@ -4,12 +4,17 @@ import android.annotation.SuppressLint
 import android.inputmethodservice.InputMethodService
 import android.inputmethodservice.Keyboard
 import android.inputmethodservice.KeyboardView
+import android.os.Handler
+import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,8 +29,13 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.NumberFormat
 import java.util.Locale
+import java.util.concurrent.Executors
 
 private const val CODE_SYMBOLS = -100
 private const val CODE_QWERTY  = -101
@@ -44,13 +54,23 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
     private var templatePanel: View? = null
     private var invoicePanel: View? = null
     private var webPanel: View? = null
+    private var pendingPanel: View? = null
     private var emojiPanel: View? = null
     private var categoryTabs: LinearLayout? = null
     private var templateAdapter: TemplateAdapter? = null
-    private var pendingPanel: View? = null
     private var orderAdapter: com.samaqu.keyboard.ui.OrderAdapter? = null
     private var rootView: View? = null
     private var focusedField: EditText? = null
+    private var selectedBank: String = ""
+
+    // Ongkir state
+    private val uiHandler = Handler(Looper.getMainLooper())
+    private val executor  = Executors.newSingleThreadExecutor()
+    private val cityCache = mutableMapOf<String, List<Pair<String,String>>>()
+    private var originAreaId = ""
+    private var destAreaId   = ""
+    private var oqDebounce: Runnable? = null
+
 
     override fun onCreate() {
         super.onCreate()
@@ -89,7 +109,7 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         val emojiTabs = view.findViewById<LinearLayout>(R.id.emojiCategoryTabs)
         com.samaqu.keyboard.ui.EMOJI_CATEGORIES.entries.forEachIndexed { i, (label, emojis) ->
             val tab = TextView(this).apply {
-                text = label.split(" ").first() // hanya emoji icon
+                text = label.split(" ").first()
                 textSize = 18f
                 setPadding(14, 4, 14, 4)
                 background = if (i == 0) getDrawable(R.drawable.tab_bg) else null
@@ -158,13 +178,18 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         view.findViewById<TextView>(R.id.btnCloseInvoice).setOnClickListener { hideAllPanels() }
         view.findViewById<TextView>(R.id.btnCloseWeb).setOnClickListener { hideAllPanels() }
 
+        setupBankButtons(view)
+        setupOngkirPanel(view)
+
         // Route keyboard input to focused invoice field
         val invoiceFields = listOf(
             view.findViewById<EditText>(R.id.invBuyer),
             view.findViewById<EditText>(R.id.invProduct),
             view.findViewById<EditText>(R.id.invQty),
             view.findViewById<EditText>(R.id.invPrice),
-            view.findViewById<EditText>(R.id.invOngkir)
+            view.findViewById<EditText>(R.id.invOngkir),
+            view.findViewById<EditText>(R.id.imbNo),
+            view.findViewById<EditText>(R.id.imbHolder)
         )
         invoiceFields.forEach { field ->
             field.setOnTouchListener { _, event ->
@@ -178,28 +203,47 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         }
 
         // Invoice generate
-        view.findViewById<TextView>(R.id.invBtnGenerate).setOnClickListener {
+        val btnGenerate = view.findViewById<TextView>(R.id.invBtnGenerate)
+        btnGenerate.setOnClickListener {
+            btnGenerate.isClickable = false
             val buyer    = view.findViewById<EditText>(R.id.invBuyer).text.toString().trim()
             val product  = view.findViewById<EditText>(R.id.invProduct).text.toString().trim()
             val qty      = view.findViewById<EditText>(R.id.invQty).text.toString().toIntOrNull() ?: 1
-            val price    = view.findViewById<EditText>(R.id.invPrice).text.toString().toDoubleOrNull() ?: 0.0
-            val ongkir   = view.findViewById<EditText>(R.id.invOngkir).text.toString().toDoubleOrNull() ?: 0.0
+            val price    = view.findViewById<EditText>(R.id.invPrice).text.toString().replace(".", "").toDoubleOrNull() ?: 0.0
+            val ongkir   = view.findViewById<EditText>(R.id.invOngkir).text.toString().replace(".", "").toDoubleOrNull() ?: 0.0
             val shipping = view.findViewById<Spinner>(R.id.invShipping).selectedItem?.toString() ?: ""
+            val bankNo   = view.findViewById<EditText>(R.id.imbNo).text.toString().trim()
+            val bankName = view.findViewById<EditText>(R.id.imbHolder).text.toString().trim()
             val fmt = NumberFormat.getInstance(Locale("id", "ID"))
-            val total = price * qty + ongkir
+            val subtotal = price * qty
+            val total    = subtotal + ongkir
+            val sep = "─────────────────────"
             val text = buildString {
                 appendLine("🧾 *INVOICE SAMAQU*")
-                appendLine("Pembeli  : $buyer")
-                appendLine("Produk   : $product")
-                appendLine("Qty      : $qty pcs")
-                appendLine("Subtotal : Rp ${fmt.format(price * qty)}")
+                appendLine(sep)
+                appendLine("Pembeli  : *$buyer*")
+                appendLine("Produk   : $product ($qty pcs)")
+                appendLine("Harga    : Rp ${fmt.format(price)}/pcs")
+                appendLine(sep)
+                appendLine("Subtotal : Rp ${fmt.format(subtotal)}")
                 if (shipping.isNotBlank()) appendLine("Kurir    : $shipping")
-                appendLine("Ongkir   : Rp ${fmt.format(ongkir)}")
-                append("*TOTAL    : Rp ${fmt.format(total)}*")
+                if (ongkir > 0) appendLine("Ongkir   : Rp ${fmt.format(ongkir)}")
+                appendLine(sep)
+                appendLine("*TOTAL   : Rp ${fmt.format(total)}*")
+                if (selectedBank.isNotBlank()) {
+                    appendLine(sep)
+                    appendLine("💳 *Transfer via $selectedBank*")
+                    if (bankNo.isNotBlank())   appendLine("No. Rek  : $bankNo")
+                    if (bankName.isNotBlank()) append("A/N      : $bankName")
+                }
             }
-            currentInputConnection?.commitText(text, 1)
+            currentInputConnection?.commitText(text.trimEnd(), 1)
             hideAllPanels()
+            btnGenerate.isClickable = true
         }
+
+        attachCurrencyWatcher(view.findViewById(R.id.invPrice))
+        attachCurrencyWatcher(view.findViewById(R.id.invOngkir))
 
         loadCached()
         return view
@@ -319,6 +363,198 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         adp.submitList(cat.templates)
     }
 
+    @android.annotation.SuppressLint("ClickableViewAccessibility")
+    private fun setupOngkirPanel(view: View) {
+        val etOrigin   = view.findViewById<EditText>(R.id.oqOrigin)
+        val etDest     = view.findViewById<EditText>(R.id.oqDest)
+        val etWeight   = view.findViewById<EditText>(R.id.oqWeight)
+        val btnCek     = view.findViewById<TextView>(R.id.btnOqCek)
+        val statusTv   = view.findViewById<TextView>(R.id.oqStatus)
+        val resultsBox = view.findViewById<LinearLayout>(R.id.oqResults)
+        val originList = view.findViewById<ListView>(R.id.oqOriginList)
+        val destList   = view.findViewById<ListView>(R.id.oqDestList)
+
+        fun showStatus(msg: String, visible: Boolean = true) {
+            statusTv.text = msg
+            statusTv.visibility = if (visible) View.VISIBLE else View.GONE
+        }
+
+        fun searchCity(query: String, list: ListView, onPick: (String, String) -> Unit) {
+            if (query.length < 3) { list.visibility = View.GONE; return }
+            cityCache[query]?.let { cached ->
+                val adp = ArrayAdapter(this, android.R.layout.simple_list_item_1, cached.map { it.first })
+                list.adapter = adp; list.visibility = View.VISIBLE
+                list.setOnItemClickListener { _, _, pos, _ -> onPick(cached[pos].first, cached[pos].second); list.visibility = View.GONE }
+                return
+            }
+            executor.execute {
+                try {
+                    val conn = URL("https://api.biteship.com/v1/maps/areas?countries=ID&input=${java.net.URLEncoder.encode(query,"UTF-8")}&type=single")
+                        .openConnection() as HttpURLConnection
+                    conn.setRequestProperty("Authorization", com.samaqu.keyboard.data.Prefs(this).biteshipKey)
+                    conn.connectTimeout = 5000; conn.readTimeout = 8000
+                    val resp = conn.inputStream.bufferedReader().readText(); conn.disconnect()
+                    val areas = JSONObject(resp).optJSONArray("areas") ?: JSONArray()
+                    val items = (0 until areas.length()).map { i ->
+                        val a = areas.getJSONObject(i)
+                        Pair("${a.optString("name")}, ${a.optString("administrative_division_level_2_name")}, ${a.optString("administrative_division_level_1_name")}", a.optString("id"))
+                    }
+                    cityCache[query] = items
+                    uiHandler.post {
+                        val adp = ArrayAdapter(this, android.R.layout.simple_list_item_1, items.map { it.first })
+                        list.adapter = adp; list.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+                        list.setOnItemClickListener { _, _, pos, _ -> onPick(items[pos].first, items[pos].second); list.visibility = View.GONE }
+                    }
+                } catch (_: Exception) { uiHandler.post { list.visibility = View.GONE } }
+            }
+        }
+
+        fun debounce(field: EditText, list: ListView, onPick: (String, String) -> Unit) {
+            field.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
+                override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    oqDebounce?.let { uiHandler.removeCallbacks(it) }
+                    val q = s?.toString()?.trim() ?: return
+                    val r = Runnable { searchCity(q, list, onPick) }
+                    oqDebounce = r; uiHandler.postDelayed(r, 400)
+                }
+            })
+        }
+
+        debounce(etOrigin, originList) { label, id -> etOrigin.setText(label); originAreaId = id }
+        debounce(etDest,   destList)   { label, id -> etDest.setText(label);   destAreaId   = id }
+
+        btnCek.setOnClickListener {
+            if (originAreaId.isBlank() || destAreaId.isBlank()) { showStatus("Pilih kota dari saran"); return@setOnClickListener }
+            val weightGram = etWeight.text.toString().toIntOrNull() ?: 1000
+            showStatus("Mengecek tarif..."); resultsBox.removeAllViews()
+            val key = com.samaqu.keyboard.data.Prefs(this).biteshipKey
+            executor.execute {
+                try {
+                    val body = JSONObject().apply {
+                        put("origin_area_id", originAreaId); put("destination_area_id", destAreaId)
+                        put("couriers", "jne,j&t,sicepat,anteraja,shopee,gojek,grab,lalamove")
+                        put("items", JSONArray().put(JSONObject().apply { put("name","Barang"); put("value",10000); put("weight",weightGram) }))
+                    }.toString().toByteArray()
+                    val conn = URL("https://api.biteship.com/v1/rates/couriers").openConnection() as HttpURLConnection
+                    conn.requestMethod = "POST"; conn.setRequestProperty("Authorization", key)
+                    conn.setRequestProperty("Content-Type", "application/json")
+                    conn.doOutput = true; conn.connectTimeout = 8000; conn.readTimeout = 10000
+                    conn.outputStream.write(body)
+                    val pricing = JSONObject(conn.inputStream.bufferedReader().readText()).optJSONArray("pricing") ?: JSONArray()
+                    conn.disconnect()
+                    val fmt = NumberFormat.getInstance(Locale("id","ID"))
+                    uiHandler.post {
+                        showStatus("", false)
+                        if (pricing.length() == 0) { showStatus("Tidak ada hasil"); return@post }
+                        resultsBox.removeAllViews()
+                        for (i in 0 until pricing.length()) {
+                            val p = pricing.getJSONObject(i)
+                            val courier = p.optString("courier_name"); val service = p.optString("courier_service_name")
+                            val price = p.optInt("price"); val eta = p.optString("duration")
+                            val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setPadding(10,8,10,8); setBackgroundColor(0xFFFFFFFF.toInt()) }
+                            row.addView(TextView(this).apply {
+                                text = "$courier $service\nRp ${fmt.format(price)} • $eta"; textSize = 11f; setTextColor(0xFF111111.toInt())
+                                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                            })
+                            row.addView(TextView(this).apply {
+                                text = "Kirim"; textSize = 11f; setTextColor(0xFF1D4ED8.toInt()); setPadding(12,4,4,4)
+                                setOnClickListener { currentInputConnection?.commitText("$courier $service: Rp ${fmt.format(price)} ($eta)", 1); hideAllPanels() }
+                            })
+                            val div = View(this).apply { layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1); setBackgroundColor(0xFFE2E8F0.toInt()) }
+                            resultsBox.addView(row); resultsBox.addView(div)
+                        }
+                    }
+                } catch (e: Exception) { uiHandler.post { showStatus("Gagal: ${e.message}") } }
+            }
+        }
+    }
+
+    private fun attachCurrencyWatcher(field: EditText) {
+        var editing = false
+        field.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
+            override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (editing || s == null) return
+                val digits = s.toString().replace(".", "")
+                if (digits.isEmpty()) return
+                val num = digits.toLongOrNull() ?: return
+                val formatted = String.format("%,d", num).replace(',', '.')
+                if (formatted != s.toString()) {
+                    editing = true
+                    s.replace(0, s.length, formatted)
+                    editing = false
+                }
+            }
+        })
+    }
+
+    private fun setupBankButtons(view: View) {
+        val bankBtns = mapOf(
+            R.id.imbBca     to "BCA",
+            R.id.imbBri     to "BRI",
+            R.id.imbBni     to "BNI",
+            R.id.imbMandiri to "Mandiri",
+            R.id.imbBsi     to "BSI",
+            R.id.imbDana    to "DANA",
+            R.id.imbOvo     to "OVO"
+        )
+        val bankDrawable = mapOf(
+            "BCA"     to R.drawable.btn_bank_bca,
+            "BRI"     to R.drawable.btn_bank_bri,
+            "BNI"     to R.drawable.btn_bank_bni,
+            "Mandiri" to R.drawable.btn_bank_mandiri,
+            "BSI"     to R.drawable.btn_bank_bsi,
+            "DANA"    to R.drawable.btn_bank_dana,
+            "OVO"     to R.drawable.btn_bank_ovo
+        )
+        val bankFields  = view.findViewById<LinearLayout>(R.id.imbFields)
+        val etNo        = view.findViewById<EditText>(R.id.imbNo)
+        val etHolder    = view.findViewById<EditText>(R.id.imbHolder)
+
+        fun loadBankInfo(bankName: String): Pair<String, String>? {
+            val prefs = com.samaqu.keyboard.data.Prefs(this)
+            return try {
+                val arr = org.json.JSONArray(prefs.bankAccountsJson)
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    if (obj.optString("bank_name").equals(bankName, ignoreCase = true)) {
+                        return Pair(obj.optString("account_number"), obj.optString("account_holder"))
+                    }
+                }
+                null
+            } catch (_: Exception) { null }
+        }
+
+        bankBtns.forEach { (id, name) ->
+            view.findViewById<TextView>(id).setOnClickListener { btn ->
+                if (selectedBank == name) {
+                    selectedBank = ""
+                    btn.setBackgroundResource(bankDrawable[name]!!)
+                    bankFields.visibility = View.GONE
+                    etNo.setText(""); etHolder.setText("")
+                } else {
+                    bankBtns.forEach { (otherId, otherName) ->
+                        view.findViewById<TextView>(otherId).setBackgroundResource(bankDrawable[otherName]!!)
+                    }
+                    selectedBank = name
+                    btn.setBackgroundResource(R.drawable.btn_bank_sel)
+                    bankFields.visibility = View.VISIBLE
+                    // Auto-fill dari data yang sudah disync
+                    val saved = loadBankInfo(name)
+                    if (saved != null) {
+                        etNo.setText(saved.first)
+                        etHolder.setText(saved.second)
+                    } else {
+                        etNo.setText(""); etHolder.setText("")
+                    }
+                }
+            }
+        }
+    }
+
     override fun onKey(primaryCode: Int, keyCodes: IntArray?) {
         // If invoice field focused, route keys there
         if (focusedField != null) {
@@ -340,13 +576,6 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         when (primaryCode) {
             Keyboard.KEYCODE_DELETE -> {
                 ic.deleteSurroundingText(1, 0)
-                // Kalau kolom sudah kosong, balik ke huruf besar
-                val before = ic.getTextBeforeCursor(1, 0)
-                if (before.isNullOrEmpty()) {
-                    caps = true
-                    qwerty?.isShifted = true
-                    keyboardView?.invalidateAllKeys()
-                }
             }
             Keyboard.KEYCODE_DONE  -> {
                 ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))

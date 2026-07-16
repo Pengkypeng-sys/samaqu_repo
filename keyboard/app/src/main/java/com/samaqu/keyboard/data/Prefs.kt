@@ -19,4 +19,21 @@ class Prefs(ctx: Context) {
         set(v) = sp.edit { putString(KEY_API_KEY, v) }
 
     val authHeader get() = "ApiKey $apiKey"
+
+    var lastPendingCount: Int
+        get() = sp.getInt("last_pending", 0)
+        set(v) = sp.edit { putInt("last_pending", v) }
+
+    var keySize: String
+        get() = sp.getString("key_size", "normal") ?: "normal"
+        set(v) = sp.edit { putString("key_size", v) }
+
+    var biteshipKey: String
+        get() = sp.getString("biteship_key", "") ?: ""
+        set(v) = sp.edit { putString("biteship_key", v) }
+
+    // Stored as JSON: [{"bank_name":"BCA","account_number":"123","account_holder":"Andi"}]
+    var bankAccountsJson: String
+        get() = sp.getString("bank_accounts", "[]") ?: "[]"
+        set(v) = sp.edit { putString("bank_accounts", v) }
 }
