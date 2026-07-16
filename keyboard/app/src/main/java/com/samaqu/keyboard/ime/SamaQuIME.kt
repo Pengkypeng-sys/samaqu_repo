@@ -146,26 +146,40 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
 
         // Shipping spinner — custom adapter dengan icon kurir
         val shippingOptions = listOf("Gojek Instant", "J&T Express", "Lalamove", "SiCepat", "JNE", "Anteraja", "Shopee Express")
+        val courierDomains = listOf("gojek.com","jet.co.id","lalamove.com","sicepat.com","jne.co.id","anteraja.id","shopee.co.id")
         val courierColors = listOf(0xFF00AA13L, 0xFFD51222L, 0xFFFF6B00L, 0xFFEA0029L, 0xFF003087L, 0xFF0B5CABL, 0xFFEE4D2DL)
-        view.findViewById<Spinner>(R.id.invShipping).adapter = object : ArrayAdapter<String>(
+        val courierLogos = arrayOfNulls<android.graphics.drawable.Drawable>(shippingOptions.size)
+        val spinnerAdapter = object : ArrayAdapter<String>(
             this, android.R.layout.simple_spinner_item, shippingOptions) {
+            private fun icon(pos: Int): android.graphics.drawable.Drawable? {
+                return courierLogos[pos] ?: run {
+                    val d = getDrawable(R.drawable.ic_courier)?.mutate()
+                    d?.setTint(courierColors.getOrElse(pos) { 0xFF1D4ED8L }.toInt())
+                    d
+                }
+            }
             override fun getView(pos: Int, cv: android.view.View?, parent: android.view.ViewGroup): android.view.View {
                 val tv = super.getView(pos, cv, parent) as android.widget.TextView
-                val icon = getDrawable(R.drawable.ic_courier)?.mutate()
-                icon?.setTint(courierColors.getOrElse(pos) { 0xFF1D4ED8L }.toInt())
-                tv.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+                tv.setCompoundDrawablesWithIntrinsicBounds(icon(pos), null, null, null)
                 tv.compoundDrawablePadding = 8
                 return tv
             }
             override fun getDropDownView(pos: Int, cv: android.view.View?, parent: android.view.ViewGroup): android.view.View {
                 val tv = super.getDropDownView(pos, cv, parent) as android.widget.TextView
-                val icon = getDrawable(R.drawable.ic_courier)?.mutate()
-                icon?.setTint(courierColors.getOrElse(pos) { 0xFF1D4ED8L }.toInt())
-                tv.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+                tv.setCompoundDrawablesWithIntrinsicBounds(icon(pos), null, null, null)
                 tv.compoundDrawablePadding = 8
                 return tv
             }
         }.also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        view.findViewById<Spinner>(R.id.invShipping).adapter = spinnerAdapter
+        // Preload courier logos in background
+        scope.launch {
+            courierDomains.forEachIndexed { i, domain ->
+                val logo = fetchLogo(domain) ?: return@forEachIndexed
+                courierLogos[i] = logo
+                withContext(Dispatchers.Main) { spinnerAdapter.notifyDataSetChanged() }
+            }
+        }
 
         // Auto Text panel
         val adp = TemplateAdapter { text ->
@@ -202,6 +216,7 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
 
         setupBankButtons(view)
         setupOngkirPanel(view)
+        scope.launch { loadLogos(view) }
 
         // Route keyboard input to focused invoice field
         val invoiceFields = listOf(
@@ -693,6 +708,44 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
                         etNo.setText(""); etHolder.setText("")
                     }
                 }
+            }
+        }
+    }
+
+    private val logoCache = mutableMapOf<String, android.graphics.drawable.Drawable>()
+
+    private suspend fun fetchLogo(domain: String): android.graphics.drawable.Drawable? =
+        withContext(Dispatchers.IO) {
+            logoCache[domain]?.let { return@withContext it }
+            try {
+                val url = java.net.URL("https://www.google.com/s2/favicons?domain=$domain&sz=64")
+                val conn = url.openConnection() as java.net.HttpURLConnection
+                conn.connectTimeout = 4000; conn.readTimeout = 4000
+                val bmp = android.graphics.BitmapFactory.decodeStream(conn.inputStream)
+                conn.disconnect()
+                val dp48 = (48 * resources.displayMetrics.density).toInt()
+                val scaled = android.graphics.Bitmap.createScaledBitmap(bmp, dp48, dp48, true)
+                val d = android.graphics.drawable.BitmapDrawable(resources, scaled)
+                logoCache[domain] = d
+                d
+            } catch (_: Exception) { null }
+        }
+
+    private suspend fun loadLogos(view: View) {
+        val bankMap = mapOf(
+            R.id.imbBca     to "bca.co.id",
+            R.id.imbBri     to "bri.co.id",
+            R.id.imbBni     to "bni.co.id",
+            R.id.imbMandiri to "bankmandiri.co.id",
+            R.id.imbBsi     to "bankbsi.co.id",
+            R.id.imbDana    to "dana.id",
+            R.id.imbOvo     to "ovo.id"
+        )
+        bankMap.forEach { (id, domain) ->
+            val logo = fetchLogo(domain) ?: return@forEach
+            withContext(Dispatchers.Main) {
+                view.findViewById<android.widget.TextView?>(id)
+                    ?.setCompoundDrawablesWithIntrinsicBounds(null, logo, null, null)
             }
         }
     }
