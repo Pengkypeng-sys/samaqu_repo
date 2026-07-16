@@ -193,7 +193,10 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         }
 
         // Toolbar buttons
-        view.findViewById<LinearLayout>(R.id.btnAutoText).setOnClickListener { showPanel(templatePanel) }
+        view.findViewById<LinearLayout>(R.id.btnAutoText).setOnClickListener {
+            view.findViewById<android.view.View?>(R.id.templateList)?.visibility = View.GONE
+            showPanel(templatePanel)
+        }
         view.findViewById<LinearLayout>(R.id.btnSync).setOnClickListener { doSync() }
         view.findViewById<LinearLayout>(R.id.btnInvoice).setOnClickListener { showPanel(invoicePanel) }
         view.findViewById<LinearLayout>(R.id.btnOngkir).setOnClickListener { showPanel(webPanel) }
@@ -314,19 +317,24 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
     }
 
     private fun applyThemePanels(view: View, dark: Boolean) {
-        val bg        = if (dark) 0xFF1A1F2E.toInt() else 0xFFF0F4FF.toInt()
-        val panelBg   = if (dark) 0xFF1E2536.toInt() else 0xFFFFFFFF.toInt()
-        val textClr   = if (dark) 0xFFEEEEEE.toInt() else 0xFF2D3748.toInt()
-        val fieldBg   = if (dark) R.drawable.field_bg else R.drawable.field_bg_light
-        val toolbarBg = if (dark) 0xFF1D4ED8.toInt() else 0xFFDEEBFF.toInt()
-        val tbIconClr = if (dark) 0xCCFFFFFF.toInt() else 0xFF1D4ED8.toInt()
-        val tabBg     = if (dark) 0xFF1A2540.toInt() else 0xFFCFDFFF.toInt()
+        val bg          = if (dark) 0xFF1A1F2E.toInt() else 0xFFF0F4FF.toInt()
+        val panelBg     = if (dark) 0xFF1E2536.toInt() else 0xFFFFFFFF.toInt()
+        val headerBg    = if (dark) 0xFF1D2D4A.toInt() else 0xFFEEF4FF.toInt()
+        val altHeaderBg = if (dark) 0xFF252D3E.toInt() else 0xFFE0ECFF.toInt()
+        val divClr      = if (dark) 0xFF2D3548.toInt() else 0xFFDDE6F5.toInt()
+        val textClr     = if (dark) 0xFFEEEEEE.toInt() else 0xFF1E293B.toInt()
+        val labelClr    = if (dark) 0xFFAAAACC.toInt() else 0xFF4B6080.toInt()
+        val accentClr   = 0xFF1D4ED8.toInt()
+        val closeClr    = if (dark) 0xFF999999.toInt() else 0xFF6B7280.toInt()
+        val fieldBg     = if (dark) R.drawable.field_bg else R.drawable.field_bg_light
+        val toolbarBg   = if (dark) 0xFF1D4ED8.toInt() else 0xFFDEEBFF.toInt()
+        val tbIconClr   = if (dark) 0xCCFFFFFF.toInt() else 0xFF1D4ED8.toInt()
+        val tabBg       = if (dark) 0xFF1A2540.toInt() else 0xFFCFDFFF.toInt()
 
         view.setBackgroundColor(bg)
 
         // Toolbar
         view.findViewById<android.view.View?>(R.id.keyboardToolbar)?.setBackgroundColor(toolbarBg)
-        // Update toolbar icon text colors
         view.findViewById<android.view.ViewGroup?>(R.id.keyboardToolbar)?.let { toolbar ->
             for (i in 0 until toolbar.childCount) {
                 val child = toolbar.getChildAt(i)
@@ -341,17 +349,45 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
             }
         }
 
+        // Panel backgrounds
         listOf(R.id.templatePanel, R.id.invoicePanel, R.id.webPanel,
                R.id.pendingPanel, R.id.emojiPanel).forEach { id ->
             view.findViewById<android.view.View?>(id)?.setBackgroundColor(panelBg)
         }
         view.findViewById<android.view.View?>(R.id.templateList)?.setBackgroundColor(panelBg)
+        view.findViewById<android.view.View?>(R.id.pendingList)?.setBackgroundColor(panelBg)
+        view.findViewById<android.view.View?>(R.id.emojiList)?.setBackgroundColor(panelBg)
 
-        // Category tabs strip
+        // Panel headers
+        view.findViewById<android.view.View?>(R.id.templatePanelHeader)?.setBackgroundColor(altHeaderBg)
+        listOf(R.id.invoicePanelHeader, R.id.pendingPanelHeader,
+               R.id.webPanelHeader).forEach { id ->
+            view.findViewById<android.view.View?>(id)?.setBackgroundColor(headerBg)
+        }
+        view.findViewById<android.view.View?>(R.id.emojiPanelHeader)?.setBackgroundColor(altHeaderBg)
+
+        // Panel dividers
+        listOf(R.id.templateDivider, R.id.invoiceDivider, R.id.pendingDivider).forEach { id ->
+            view.findViewById<android.view.View?>(id)?.setBackgroundColor(divClr)
+        }
+
+        // Panel title colors
+        listOf(R.id.invoicePanelTitle, R.id.pendingPanelTitle,
+               R.id.emojiPanelTitle, R.id.webPanelTitle).forEach { id ->
+            view.findViewById<android.widget.TextView?>(id)?.setTextColor(accentClr)
+        }
+
+        // Close buttons
+        listOf(R.id.btnClosePanel, R.id.btnCloseInvoice,
+               R.id.btnClosePending, R.id.btnCloseEmoji, R.id.btnCloseWeb).forEach { id ->
+            view.findViewById<android.widget.TextView?>(id)?.setTextColor(closeClr)
+        }
+
+        // Category tabs strip background
         (view.findViewById<android.view.View?>(R.id.categoryTabs)?.parent as? android.view.View)
             ?.setBackgroundColor(tabBg)
 
-        // Input fields — background + text color + hint
+        // Input fields
         listOf(R.id.invBuyer, R.id.invProduct, R.id.invQty, R.id.invPrice,
                R.id.invOngkir, R.id.imbNo, R.id.imbHolder,
                R.id.oqOrigin, R.id.oqDest, R.id.oqWeight).forEach { id ->
@@ -361,8 +397,44 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
                 et.setHintTextColor(if (dark) 0xFF666888.toInt() else 0xFF8899BB.toInt())
             }
         }
-        view.findViewById<android.widget.TextView?>(R.id.pendingEmpty)?.setTextColor(textClr)
-        view.findViewById<android.widget.TextView?>(R.id.oqStatus)?.setTextColor(textClr)
+
+        // Invoice field labels
+        listOf(R.id.pendingEmpty, R.id.oqStatus).forEach { id ->
+            view.findViewById<android.widget.TextView?>(id)?.setTextColor(textClr)
+        }
+
+        // Ongkir city suggestion lists
+        listOf(R.id.oqOriginList, R.id.oqDestList).forEach { id ->
+            view.findViewById<android.widget.ListView?>(id)?.setBackgroundColor(panelBg)
+        }
+
+        // Invoice label traversal
+        applyInvoiceLabelColors(view, labelClr, textClr, dark)
+    }
+
+    private fun applyInvoiceLabelColors(view: View, labelClr: Int, textClr: Int, dark: Boolean) {
+        val labelIds = listOf(
+            R.id.invBuyer, R.id.invProduct, R.id.invQty, R.id.invPrice,
+            R.id.invOngkir, R.id.imbNo, R.id.imbHolder
+        )
+        // Traverse invoice panel to fix all small label TextViews
+        val invoicePanel = view.findViewById<android.view.ViewGroup?>(R.id.invoicePanel) ?: return
+        fun traverse(vg: android.view.ViewGroup) {
+            for (i in 0 until vg.childCount) {
+                when (val child = vg.getChildAt(i)) {
+                    is android.widget.EditText -> { /* handled above */ }
+                    is android.widget.TextView -> {
+                        // Small labels (textSize ~10sp used for field labels)
+                        if (child.textSize <= 32f && child.id !in listOf(
+                                R.id.btnCloseInvoice, R.id.invBtnGenerate, R.id.invoicePanelTitle)) {
+                            child.setTextColor(labelClr)
+                        }
+                    }
+                    is android.view.ViewGroup -> traverse(child)
+                }
+            }
+        }
+        traverse(invoicePanel)
     }
 
     override fun onStartInputView(info: android.view.inputmethod.EditorInfo, restarting: Boolean) {
@@ -501,8 +573,8 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         val adp  = templateAdapter ?: return
         tabs.removeAllViews()
         if (allCategories.isEmpty()) return
-        selectCategory(allCategories.first(), adp)
-        allCategories.forEach { cat ->
+        // Don't auto-select — templateList stays hidden until user taps a chip
+        allCategories.forEachIndexed { index, cat ->
             val tab = TextView(this).apply {
                 text = cat.category.name
                 textSize = 12f
@@ -510,14 +582,22 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
                 setTextColor(0xFF1D4ED8.toInt())
                 typeface = android.graphics.Typeface.SERIF
                 background = getDrawable(R.drawable.tab_bg)
-                setOnClickListener { selectCategory(cat, adp) }
+                setOnClickListener {
+                    // Highlight selected tab
+                    for (i in 0 until tabs.childCount)
+                        tabs.getChildAt(i).alpha = 0.5f
+                    alpha = 1f
+                    selectCategory(cat, adp)
+                }
             }
+            tab.alpha = 0.5f
             tabs.addView(tab)
         }
     }
 
     private fun selectCategory(cat: CategoryWithTemplates, adp: TemplateAdapter) {
         adp.submitList(cat.templates)
+        rootView?.findViewById<android.view.View?>(R.id.templateList)?.visibility = View.VISIBLE
     }
 
     @android.annotation.SuppressLint("ClickableViewAccessibility")
