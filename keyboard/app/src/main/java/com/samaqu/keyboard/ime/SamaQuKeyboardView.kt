@@ -25,11 +25,19 @@ class SamaQuKeyboardView @JvmOverloads constructor(
             KeyboardView::class.java.getDeclaredField("mKeyBackground")
                 .also { it.isAccessible = true }.set(this, bgDrawable)
         } catch (_: Exception) {}
-        // Change text color for regular keys
+        // Change text color for regular keys via mKeyTextColor (mPaint gets reset in onDraw)
+        val textColor = if (dark) 0xFFFFFFFF.toInt() else 0xFF1A1F2E.toInt()
+        try {
+            KeyboardView::class.java.getDeclaredField("mKeyTextColor")
+                .also { it.isAccessible = true }.setInt(this, textColor)
+        } catch (_: Exception) {}
+        // Also set mPaint as fallback for some AOSP variants
         try {
             val f = KeyboardView::class.java.getDeclaredField("mPaint")
             f.isAccessible = true
-            (f.get(this) as? Paint)?.color = if (dark) 0xFFFFFFFF.toInt() else 0xFF1A1F2E.toInt()
+            (f.get(this) as? Paint)?.color = textColor
+        } catch (_: Exception) {}
+        try {
             KeyboardView::class.java.getDeclaredField("mDrawPending")
                 .also { it.isAccessible = true }.setBoolean(this, true)
         } catch (_: Exception) {}
@@ -112,12 +120,18 @@ class SamaQuKeyboardView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        // Ensure bold is applied before buffer is rendered
+        // Re-apply mKeyTextColor before buffer renders (KeyboardView may reset it)
+        val textColor = if (isDark) 0xFFFFFFFF.toInt() else 0xFF1A1F2E.toInt()
         try {
+            KeyboardView::class.java.getDeclaredField("mKeyTextColor")
+                .also { it.isAccessible = true }.setInt(this, textColor)
             val f = KeyboardView::class.java.getDeclaredField("mPaint")
             f.isAccessible = true
-            (f.get(this) as? Paint)?.isFakeBoldText = true
-            // force redraw of buffer so bold takes effect
+            (f.get(this) as? Paint)?.let {
+                it.isFakeBoldText = true
+                it.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                it.color = textColor
+            }
             KeyboardView::class.java.getDeclaredField("mDrawPending")
                 .also { it.isAccessible = true }.setBoolean(this, true)
         } catch (_: Exception) {}
