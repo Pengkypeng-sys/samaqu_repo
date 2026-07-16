@@ -209,34 +209,44 @@ export default function SettingsPage() {
         <p className="text-xs text-gray-400 -mt-2">
           Isi versi & URL APK terbaru. Keyboard akan notif CS jika ada update saat Sync.
         </p>
+        {/* APK */}
+        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">📱 APK Android</div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-xs text-gray-500 mb-1 block">Versi APK (contoh: 1.2.0)</Label>
-            <Input
-              value={config.apk_version || ''}
-              onChange={e => setConfig(c => ({ ...c, apk_version: e.target.value }))}
-              placeholder="1.0.0"
-              className="text-sm font-mono"
-            />
+            <Label className="text-xs text-gray-500 mb-1 block">Versi APK</Label>
+            <Input value={config.apk_version || ''} onChange={e => setConfig(c => ({ ...c, apk_version: e.target.value }))}
+              placeholder="1.0.0" className="text-sm font-mono" />
           </div>
           <div>
             <Label className="text-xs text-gray-500 mb-1 block">URL Download APK</Label>
-            <Input
-              value={config.apk_url || ''}
-              onChange={e => setConfig(c => ({ ...c, apk_url: e.target.value }))}
-              placeholder="https://github.com/.../app.apk"
-              className="text-sm"
-            />
+            <Input value={config.apk_url || ''} onChange={e => setConfig(c => ({ ...c, apk_url: e.target.value }))}
+              placeholder="https://github.com/.../app.apk" className="text-sm" />
           </div>
         </div>
         <div>
-          <Label className="text-xs text-gray-500 mb-1 block">Changelog (ditampilkan ke CS)</Label>
-          <Input
-            value={config.apk_changelog || ''}
-            onChange={e => setConfig(c => ({ ...c, apk_changelog: e.target.value }))}
-            placeholder="- Fitur baru: ... \n- Perbaikan: ..."
-            className="text-sm"
-          />
+          <Label className="text-xs text-gray-500 mb-1 block">Changelog APK</Label>
+          <Input value={config.apk_changelog || ''} onChange={e => setConfig(c => ({ ...c, apk_changelog: e.target.value }))}
+            placeholder="- Fitur baru ..." className="text-sm" />
+        </div>
+
+        {/* Extension */}
+        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide pt-2">🧩 Extension Chrome</div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className="text-xs text-gray-500 mb-1 block">Versi Extension</Label>
+            <Input value={config.ext_version || ''} onChange={e => setConfig(c => ({ ...c, ext_version: e.target.value }))}
+              placeholder="1.0.0" className="text-sm font-mono" />
+          </div>
+          <div>
+            <Label className="text-xs text-gray-500 mb-1 block">URL Download Extension (.zip)</Label>
+            <Input value={config.ext_url || ''} onChange={e => setConfig(c => ({ ...c, ext_url: e.target.value }))}
+              placeholder="https://github.com/.../extension.zip" className="text-sm" />
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs text-gray-500 mb-1 block">Changelog Extension</Label>
+          <Input value={config.ext_changelog || ''} onChange={e => setConfig(c => ({ ...c, ext_changelog: e.target.value }))}
+            placeholder="- Fitur baru ..." className="text-sm" />
         </div>
         <Button onClick={saveConfig} size="sm" disabled={savingConfig} variant="outline" className="gap-1">
           {savingConfig ? <Loader2 size={13} className="animate-spin" /> : null}

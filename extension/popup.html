@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  body { width: 280px; font-family: system-ui, sans-serif; margin: 0; background: #fff; }
+  body { width: 290px; font-family: system-ui, sans-serif; margin: 0; background: #fff; }
   .header { background: #1D4ED8; color: #fff; padding: 14px 16px; }
   .header h2 { margin: 0; font-size: 15px; }
   .header p  { margin: 2px 0 0; font-size: 11px; opacity: .8; }
@@ -18,10 +18,23 @@
   button {
     width: 100%; padding: 9px; background: #1D4ED8; color: #fff;
     border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
-    cursor: pointer;
+    cursor: pointer; margin-bottom: 6px;
   }
   button:hover { background: #1558A0; }
-  #msg { font-size: 11px; color: #16A34A; margin-top: 8px; text-align: center; display: none; }
+  #msg { font-size: 11px; color: #16A34A; margin-top: 4px; text-align: center; display: none; }
+  #updateBanner {
+    display: none; margin-top: 10px; padding: 10px 12px;
+    background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px;
+  }
+  #updateBanner .ut { font-size: 12px; font-weight: 700; color: #92400E; margin-bottom: 4px; }
+  #updateBanner .uc { font-size: 11px; color: #78350F; margin-bottom: 6px; }
+  #updateBanner a {
+    display: block; text-align: center; padding: 6px; background: #F59E0B;
+    color: #fff; border-radius: 6px; font-size: 11px; font-weight: 700;
+    text-decoration: none;
+  }
+  #updateBanner a:hover { background: #D97706; }
+  .ver { font-size: 10px; color: #9CA3AF; text-align: right; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -36,11 +49,16 @@
   <label>JWT Token (opsional — untuk fitur order)</label>
   <input type="password" id="token" placeholder="eyJhbGci...">
 
-  <label>Biteship API Key (untuk Cek Ongkir)</label>
-  <input type="password" id="biteship" placeholder="biteship_live.xxx">
-
   <button id="save">Simpan</button>
   <div id="msg">✓ Tersimpan!</div>
+
+  <div id="updateBanner">
+    <div class="ut" id="updateTitle">📦 Update Tersedia</div>
+    <div class="uc" id="updateChangelog"></div>
+    <a id="updateLink" href="#" target="_blank">Download Update</a>
+  </div>
+
+  <div class="ver" id="verLine"></div>
 </div>
 <script src="popup.js"></script>
 </body>
