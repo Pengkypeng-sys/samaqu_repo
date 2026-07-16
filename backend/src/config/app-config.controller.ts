@@ -6,9 +6,19 @@ import { AppConfigService } from './app-config.service';
 export class AppConfigController {
   constructor(private service: AppConfigService) {}
 
-  // Public — keyboard sync tanpa login
   @Get()
   getAll() { return this.service.getAll(); }
+
+  // APK version check — returns apk_version & apk_url from config
+  @Get('version')
+  async getVersion() {
+    const cfg = await this.service.getAll();
+    return {
+      version: cfg['apk_version'] || '1.0.0',
+      apk_url: cfg['apk_url'] || '',
+      changelog: cfg['apk_changelog'] || '',
+    };
+  }
 
   @UseGuards(JwtAuthGuard)
   @Put()

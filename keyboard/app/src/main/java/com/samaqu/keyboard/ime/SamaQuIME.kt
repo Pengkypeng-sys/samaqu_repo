@@ -364,6 +364,31 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
             allCategories = withContext(Dispatchers.IO) { repo.getTemplates() }
             renderCategories()
             status?.setTextColor(if (ok) 0xFF22C55E.toInt() else 0xFFEF4444.toInt())
+            if (ok) checkForUpdate()
+        }
+    }
+
+    private fun checkForUpdate() {
+        scope.launch {
+            try {
+                val prefs = com.samaqu.keyboard.data.Prefs(this@SamaQuIME)
+                val info = withContext(Dispatchers.IO) {
+                    com.samaqu.keyboard.network.RetrofitClient.api.getLatestVersion()
+                }
+                val serverVer = info["version"] ?: return@launch
+                val apkUrl   = info["apk_url"] ?: ""
+                val changelog = info["changelog"] ?: ""
+                val currentVer = packageManager.getPackageInfo(packageName, 0).versionName ?: "1.0"
+                if (serverVer != currentVer && apkUrl.isNotBlank()) {
+                    // Show toast-style update banner
+                    val ctx = applicationContext
+                    android.widget.Toast.makeText(
+                        ctx,
+                        "📦 Update tersedia v$serverVer! Buka app SAMAQU untuk download.",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (_: Exception) {}
         }
     }
 

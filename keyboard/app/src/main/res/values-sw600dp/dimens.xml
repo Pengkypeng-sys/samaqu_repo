@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tablet (≥600dp) dimensions -->
+<resources>
+    <dimen name="key_height">56dp</dimen>
+    <dimen name="key_height_large">68dp</dimen>
+    <dimen name="toolbar_height">54dp</dimen>
+    <dimen name="panel_height">280dp</dimen>
+    <dimen name="invoice_panel_height">310dp</dimen>
+    <dimen name="web_panel_height">320dp</dimen>
+    <dimen name="key_text_size">17sp</dimen>
+</resources>

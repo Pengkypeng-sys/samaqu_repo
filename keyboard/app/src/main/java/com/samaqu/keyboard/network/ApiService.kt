@@ -49,6 +49,9 @@ interface ApiService {
     @GET("config")
     suspend fun getConfig(): Map<String, String>
 
+    @GET("config/version")
+    suspend fun getLatestVersion(): Map<String, String>
+
     @GET("products")
     suspend fun getProducts(@Header("Authorization") auth: String): List<Product>
 

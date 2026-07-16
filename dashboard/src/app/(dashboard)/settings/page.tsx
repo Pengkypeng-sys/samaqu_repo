@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { api, getApiUrl, STORAGE_KEY_URL } from '@/lib/api';
 import {
   CheckCircle, XCircle, Loader2, Settings2, Link2,
-  CreditCard, Plus, Trash2, Key, Truck
+  CreditCard, Plus, Trash2, Key, Smartphone
 } from 'lucide-react';
 
 interface BankAccount {
@@ -195,9 +195,52 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <Button onClick={saveConfig} size="sm" disabled={savingConfig} className="gap-1">
+        <Button onClick={saveConfig} size="sm" disabled={savingConfig} className="gap-1 mb-0">
           {savingConfig ? <Loader2 size={13} className="animate-spin" /> : null}
           Simpan Konfigurasi
+        </Button>
+      </div>
+
+      {/* ── APK Update ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+        <div className="flex items-center gap-2 text-gray-700 font-semibold text-sm">
+          <Smartphone size={15} className="text-green-500" /> Update APK Android
+        </div>
+        <p className="text-xs text-gray-400 -mt-2">
+          Isi versi & URL APK terbaru. Keyboard akan notif CS jika ada update saat Sync.
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className="text-xs text-gray-500 mb-1 block">Versi APK (contoh: 1.2.0)</Label>
+            <Input
+              value={config.apk_version || ''}
+              onChange={e => setConfig(c => ({ ...c, apk_version: e.target.value }))}
+              placeholder="1.0.0"
+              className="text-sm font-mono"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-gray-500 mb-1 block">URL Download APK</Label>
+            <Input
+              value={config.apk_url || ''}
+              onChange={e => setConfig(c => ({ ...c, apk_url: e.target.value }))}
+              placeholder="https://github.com/.../app.apk"
+              className="text-sm"
+            />
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs text-gray-500 mb-1 block">Changelog (ditampilkan ke CS)</Label>
+          <Input
+            value={config.apk_changelog || ''}
+            onChange={e => setConfig(c => ({ ...c, apk_changelog: e.target.value }))}
+            placeholder="- Fitur baru: ... \n- Perbaikan: ..."
+            className="text-sm"
+          />
+        </div>
+        <Button onClick={saveConfig} size="sm" disabled={savingConfig} variant="outline" className="gap-1">
+          {savingConfig ? <Loader2 size={13} className="animate-spin" /> : null}
+          Simpan Info Update
         </Button>
       </div>
 

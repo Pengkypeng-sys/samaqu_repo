@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:background="@drawable/card_bg"
+    android:padding="14dp" android:layout_marginBottom="8dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="6dp">
+        <TextView android:id="@+id/tvCourier" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:textSize="13sp" android:textStyle="bold" android:textColor="#FF111111"/>
+        <TextView android:id="@+id/tvPrice" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="14sp" android:textStyle="bold" android:textColor="#FF1D4ED8"/>
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/tvService" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:textSize="11sp" android:textColor="#FF6B7280"/>
+        <TextView android:id="@+id/tvEta" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="11sp" android:textColor="#FF6B7280" android:layout_marginEnd="8dp"/>
+        <TextView android:id="@+id/btnKirim" android:layout_width="wrap_content" android:layout_height="30dp"
+            android:background="@drawable/btn_outline_blue_bg" android:text="Kirim"
+            android:textColor="#FF1D4ED8" android:textSize="11sp" android:textStyle="bold"
+            android:gravity="center" android:paddingStart="10dp" android:paddingEnd="10dp"
+            android:clickable="true" android:focusable="true"/>
+    </LinearLayout>
+</LinearLayout>

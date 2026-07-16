@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Keyboard body rounded rect -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,32 Q24,24 32,24 L76,24 Q84,24 84,32 L84,70 Q84,78 76,78 L32,78 Q24,78 24,70 Z" />
+
+    <!-- Key row 1 -->
+    <path android:fillColor="#BFDBFE" android:pathData="M28,33 L37,33 L37,40 L28,40 Z" />
+    <path android:fillColor="#BFDBFE" android:pathData="M39,33 L48,33 L48,40 L39,40 Z" />
+    <path android:fillColor="#BFDBFE" android:pathData="M50,33 L59,33 L59,40 L50,40 Z" />
+    <path android:fillColor="#BFDBFE" android:pathData="M61,33 L70,33 L70,40 L61,40 Z" />
+    <path android:fillColor="#BFDBFE" android:pathData="M72,33 L80,33 L80,40 L72,40 Z" />
+
+    <!-- Key row 2 -->
+    <path android:fillColor="#BFDBFE" android:pathData="M32,43 L41,43 L41,50 L32,50 Z" />
+    <path android:fillColor="#BFDBFE" android:pathData="M43,43 L52,43 L52,50 L43,50 Z" />
+    <path android:fillColor="#BFDBFE" android:pathData="M54,43 L63,43 L63,50 L54,50 Z" />
+    <path android:fillColor="#BFDBFE" android:pathData="M65,43 L74,43 L74,50 L65,50 Z" />
+
+    <!-- Spacebar -->
+    <path android:fillColor="#93C5FD" android:pathData="M30,58 Q30,55 33,55 L75,55 Q78,55 78,58 L78,64 Q78,67 75,67 L33,67 Q30,67 30,64 Z" />
+
+    <!-- Gold badge top-right -->
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M78,14 A10,10 0 1,1 77.99,14 Z" />
+
+    <!-- SQ text on badge via paths -->
+    <path
+        android:fillColor="#1E3A8A"
+        android:pathData="M74.5,10.5 Q74.5,9 76,9 L80,9 Q81.5,9 81.5,10.5 Q81.5,11.5 79.5,12 Q81.5,12.5 81.5,14 Q81.5,15.5 80,15.5 L76,15.5 Q74.5,15.5 74.5,14 L75.5,14 Q75.5,14.5 76,14.5 L80,14.5 Q80.5,14.5 80.5,14 Q80.5,13 78,13 L78,11 Q80.5,11 80.5,10.5 Q80.5,10 80,10 L76,10 Q75.5,10 75.5,10.5 Z" />
+
+</vector>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_invoice"  android:title="Invoice"    android:icon="@drawable/ic_nav_invoice" />
+    <item android:id="@+id/nav_ongkir"   android:title="Cek Ongkir" android:icon="@drawable/ic_nav_ongkir" />
+    <item android:id="@+id/nav_autotext" android:title="Auto Text"  android:icon="@drawable/ic_nav_autotext" />
+    <item android:id="@+id/nav_pending"  android:title="Pending"    android:icon="@drawable/ic_nav_pending" />
+    <item android:id="@+id/nav_dashboard" android:title="Dashboard" android:icon="@drawable/ic_nav_dashboard" />
+</menu>

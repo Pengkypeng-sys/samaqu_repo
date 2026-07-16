@@ -39,4 +39,5 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.service)
     implementation(libs.gson)
+    implementation(libs.workmanager)
 }

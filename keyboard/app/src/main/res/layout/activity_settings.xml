@@ -6,37 +6,59 @@
     android:padding="24dp">
 
     <TextView
-        android:text="SAMAQU Keyboard"
-        android:textSize="22sp"
+        android:text="SAMAQU"
+        android:textSize="24sp"
         android:textStyle="bold"
+        android:textColor="#FF1E40AF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:text="Keyboard khusus CS — Auto Text instan"
+        android:textSize="13sp"
+        android:textColor="#FF64748B"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilApiUrl"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Backend URL"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_marginBottom="16dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etApiUrl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textUri"
-            android:text="http://192.168.1.x:3000" />
+            android:inputType="textUri" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilApiKey"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="API Key (dari profil CS)"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_marginBottom="24dp">
+        android:hint="JWT Token (dari login dashboard)"
+        android:layout_marginBottom="16dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etApiKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilBiteshipKey"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Biteship API Key (untuk Cek Ongkir)"
+        android:layout_marginBottom="16dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etBiteshipKey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword" />
@@ -46,22 +68,99 @@
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Simpan"
-        android:layout_marginBottom="16dp" />
+        android:text="Simpan &amp; Aktifkan Notifikasi"
+        android:layout_marginBottom="32dp" />
+
+    <TextView
+        android:text="Langkah Setup Keyboard"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="#FF1E293B"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:text="1️⃣  Aktifkan SAMAQU di pengaturan keyboard"
+        android:textSize="13sp"
+        android:textColor="#FF475569"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnEnableIME"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Aktifkan Keyboard di Pengaturan"
+        android:text="Buka Pengaturan Keyboard"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:text="2️⃣  Pilih SAMAQU sebagai keyboard aktif"
+        android:textSize="13sp"
+        android:textColor="#FF475569"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSelectIME"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pilih SAMAQU sebagai Keyboard Aktif"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+        android:text="Pilih SAMAQU sebagai Keyboard"
+        android:layout_marginBottom="24dp" />
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFE2E8F0" android:layout_marginBottom="24dp" />
+
+    <!-- Keyboard Appearance -->
+    <TextView
+        android:text="Tampilan Keyboard"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="#FF1E293B"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:text="Ukuran Tombol"
+        android:textSize="13sp"
+        android:textColor="#FF475569"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/rgKeySize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+        <RadioButton
+            android:id="@+id/rbNormal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Normal"
+            android:textColor="#FF1E293B"
+            android:checked="true" />
+        <RadioButton
+            android:id="@+id/rbLarge"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Besar"
+            android:textColor="#FF1E293B" />
+    </RadioGroup>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FFE2E8F0" android:layout_marginBottom="24dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🖥️  Buka Dashboard"
+        android:layout_marginBottom="8dp" />
 
 </LinearLayout>

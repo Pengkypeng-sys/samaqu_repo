@@ -5,4 +5,6 @@
     <string name="settings_label">Pengaturan SAMAQU</string>
     <string name="pref_api_url">API URL</string>
     <string name="pref_api_key">API Key</string>
+    <string name="accessibility_desc">SAMAQU pakai akses ini untuk otomatis paste template ke kolom chat</string>
+    <string name="key_num">123</string>
 </resources>
