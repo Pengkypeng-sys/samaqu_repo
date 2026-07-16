@@ -85,7 +85,7 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         val prefs0 = com.samaqu.keyboard.data.Prefs(this)
         val large = prefs0.keySize == "large"
         val dark  = prefs0.darkTheme
-        view.setBackgroundColor(if (dark) 0xFF1A1F2E.toInt() else 0xFFE8ECF0.toInt())
+        applyThemePanels(view, dark)
 
         qwerty  = Keyboard(this, if (large) R.xml.qwerty_large  else R.xml.qwerty)
         symbols = Keyboard(this, if (large) R.xml.symbols_large else R.xml.symbols)
@@ -282,12 +282,40 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         return view
     }
 
+    private fun applyThemePanels(view: View, dark: Boolean) {
+        val bg      = if (dark) 0xFF1A1F2E.toInt() else 0xFFF4F6FA.toInt()
+        val panelBg = if (dark) 0xFF1E2536.toInt() else 0xFFFFFFFF.toInt()
+        val textClr = if (dark) 0xFFEEEEEE.toInt() else 0xFF1A1F2E.toInt()
+
+        view.setBackgroundColor(bg)
+
+        listOf(R.id.templatePanel, R.id.invoicePanel, R.id.webPanel,
+               R.id.pendingPanel, R.id.emojiPanel).forEach { id ->
+            view.findViewById<android.view.View?>(id)?.setBackgroundColor(panelBg)
+        }
+        view.findViewById<android.view.View?>(R.id.templateList)?.setBackgroundColor(panelBg)
+
+        // Category tabs strip
+        (view.findViewById<android.view.View?>(R.id.categoryTabs)?.parent as? android.view.View)
+            ?.setBackgroundColor(if (dark) 0xFF1A2540.toInt() else 0xFFE0E5F0.toInt())
+
+        // Invoice & other input field text colors
+        listOf(R.id.invBuyer, R.id.invProduct, R.id.invQty, R.id.invPrice,
+               R.id.invOngkir, R.id.imbNo, R.id.imbHolder,
+               R.id.oqOrigin, R.id.oqDest, R.id.oqWeight).forEach { id ->
+            view.findViewById<android.widget.EditText?>(id)?.setTextColor(textClr)
+        }
+        // Pending & web panel text
+        view.findViewById<android.widget.TextView?>(R.id.pendingEmpty)?.setTextColor(textClr)
+        view.findViewById<android.widget.TextView?>(R.id.oqStatus)?.setTextColor(textClr)
+    }
+
     override fun onStartInputView(info: android.view.inputmethod.EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         // Re-apply theme every time keyboard appears (user may have changed it in Settings)
         val prefs = com.samaqu.keyboard.data.Prefs(this)
         val dark = prefs.darkTheme
-        rootView?.setBackgroundColor(if (dark) 0xFF1A1F2E.toInt() else 0xFFE8ECF0.toInt())
+        rootView?.let { applyThemePanels(it, dark) }
         (keyboardView as? SamaQuKeyboardView)?.applyTheme(dark)
 
         val inputClass = info.inputType and android.text.InputType.TYPE_MASK_CLASS
