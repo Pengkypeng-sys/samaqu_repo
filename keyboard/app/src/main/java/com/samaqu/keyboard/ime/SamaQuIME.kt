@@ -286,6 +286,7 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         val bg      = if (dark) 0xFF1A1F2E.toInt() else 0xFFF4F6FA.toInt()
         val panelBg = if (dark) 0xFF1E2536.toInt() else 0xFFFFFFFF.toInt()
         val textClr = if (dark) 0xFFEEEEEE.toInt() else 0xFF1A1F2E.toInt()
+        val fieldBg = if (dark) R.drawable.field_bg else R.drawable.field_bg_light
 
         view.setBackgroundColor(bg)
 
@@ -299,13 +300,16 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
         (view.findViewById<android.view.View?>(R.id.categoryTabs)?.parent as? android.view.View)
             ?.setBackgroundColor(if (dark) 0xFF1A2540.toInt() else 0xFFE0E5F0.toInt())
 
-        // Invoice & other input field text colors
+        // Invoice & ongkir input fields — fix background AND text color so not camouflaged
         listOf(R.id.invBuyer, R.id.invProduct, R.id.invQty, R.id.invPrice,
                R.id.invOngkir, R.id.imbNo, R.id.imbHolder,
                R.id.oqOrigin, R.id.oqDest, R.id.oqWeight).forEach { id ->
-            view.findViewById<android.widget.EditText?>(id)?.setTextColor(textClr)
+            view.findViewById<android.widget.EditText?>(id)?.let { et ->
+                et.setBackgroundResource(fieldBg)
+                et.setTextColor(textClr)
+                et.setHintTextColor(if (dark) 0xFF666888.toInt() else 0xFF9999AA.toInt())
+            }
         }
-        // Pending & web panel text
         view.findViewById<android.widget.TextView?>(R.id.pendingEmpty)?.setTextColor(textClr)
         view.findViewById<android.widget.TextView?>(R.id.oqStatus)?.setTextColor(textClr)
     }
