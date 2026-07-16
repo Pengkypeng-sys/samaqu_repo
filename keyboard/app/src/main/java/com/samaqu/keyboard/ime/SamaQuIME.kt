@@ -284,6 +284,12 @@ class SamaQuIME : InputMethodService(), KeyboardView.OnKeyboardActionListener {
 
     override fun onStartInputView(info: android.view.inputmethod.EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        // Re-apply theme every time keyboard appears (user may have changed it in Settings)
+        val prefs = com.samaqu.keyboard.data.Prefs(this)
+        val dark = prefs.darkTheme
+        rootView?.setBackgroundColor(if (dark) 0xFF1A1F2E.toInt() else 0xFFE8ECF0.toInt())
+        (keyboardView as? SamaQuKeyboardView)?.applyTheme(dark)
+
         val inputClass = info.inputType and android.text.InputType.TYPE_MASK_CLASS
         val isNumeric = inputClass == android.text.InputType.TYPE_CLASS_NUMBER ||
                         inputClass == android.text.InputType.TYPE_CLASS_PHONE
